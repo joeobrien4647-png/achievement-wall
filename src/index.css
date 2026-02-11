@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+/* Hide scrollbars on horizontal carousels */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* View Transitions (progressive enhancement) */
+::view-transition-old(page) {
+  animation: fade-out 120ms ease-out;
+}
+::view-transition-new(page) {
+  animation: fade-in 120ms ease-in;
+}
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
