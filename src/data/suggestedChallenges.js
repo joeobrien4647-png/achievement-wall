@@ -9,11 +9,12 @@ import { GRADIENT_PRESETS, TYPE_COLORS } from "./schema";
 const G = GRADIENT_PRESETS;
 const now = new Date().toISOString();
 
-function wish(id, name, opts) {
+function wish(id, name, category, opts) {
   const type = opts.type || "Ultra";
   return {
     id,
     name,
+    category,
     distance: opts.distance || null,
     type,
     elevation: opts.elevation || null,
@@ -46,54 +47,54 @@ export const suggestedChallenges = [
   // ═══════════════════════════════════════
   // UK MOUNTAIN
   // ═══════════════════════════════════════
-  wish("wish-nat3p", "National 3 Peaks", {
+  wish("wish-nat3p", "National 3 Peaks", "Mountains", {
     type: "Mountain", distance: 42, elevation: 3400,
     location: "Ben Nevis + Scafell Pike + Snowdon",
     difficulty: 5, badge: "⛰️", gradient: G[0],
     appeal: "The holy trinity of UK peaks in 24 hours. Ben Nevis is already done — two more summits to claim the crown.",
   }),
-  wish("wish-w3000", "Welsh 3000s", {
+  wish("wish-w3000", "Welsh 3000s", "Mountains", {
     type: "Mountain", distance: 50, elevation: 3500,
     location: "Snowdonia, Wales",
     difficulty: 5, badge: "🏴󠁧󠁢󠁷󠁬󠁳󠁿", gradient: G[1],
     appeal: "All 15 peaks over 3,000ft in Snowdonia in a single push. The ultimate Welsh mountain challenge.",
   }),
-  wish("wish-scafe", "Scafell Pike", {
+  wish("wish-scafe", "Scafell Pike", "Mountains", {
     type: "Mountain", distance: 14, elevation: 978,
     location: "Lake District, England",
     difficulty: 3, badge: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", gradient: G[2],
     peaks: ["Scafell Pike (978m)"],
     appeal: "England's highest peak. With Ben Nevis done, this completes two of three.",
   }),
-  wish("wish-snowd", "Snowdon (Yr Wyddfa)", {
+  wish("wish-snowd", "Snowdon (Yr Wyddfa)", "Mountains", {
     type: "Mountain", distance: 14, elevation: 1085,
     location: "Snowdonia, Wales",
     difficulty: 3, badge: "🏴󠁧󠁢󠁷󠁬󠁳󠁿", gradient: G[3],
     peaks: ["Snowdon (1,085m)"],
     appeal: "Wales's highest. Combined with Ben Nevis and Scafell Pike — that's the full set.",
   }),
-  wish("wish-helve", "Helvellyn via Striding Edge", {
+  wish("wish-helve", "Helvellyn via Striding Edge", "Mountains", {
     type: "Mountain", distance: 16, elevation: 900,
     location: "Lake District, England",
     difficulty: 4, badge: "🗡️", gradient: G[4],
     peaks: ["Helvellyn (950m)"],
     appeal: "The classic knife-edge scramble. Grade 1 scramble that turns a walk into an adventure.",
   }),
-  wish("wish-fandx", "Fan Dance", {
+  wish("wish-fandx", "Fan Dance", "Mountains", {
     type: "Mountain", distance: 24, elevation: 1000,
     location: "Brecon Beacons, Wales",
     difficulty: 4, badge: "⚔️", gradient: G[5],
     peaks: ["Pen y Fan (886m)"],
     appeal: "The SAS selection march route. Pen y Fan and back, against the clock. Raw military endurance.",
   }),
-  wish("wish-cairn", "Cairngorm 4000ers", {
+  wish("wish-cairn", "Cairngorm 4000ers", "Mountains", {
     type: "Mountain", distance: 35, elevation: 1800,
     location: "Cairngorms, Scotland",
     difficulty: 4, badge: "🏔️", gradient: G[6],
     peaks: ["Ben Macdui (1,309m)", "Braeriach (1,296m)", "Cairn Toul (1,291m)", "Cairn Gorm (1,245m)"],
     appeal: "Scotland's highest plateau. Four peaks over 4,000ft in the most remote terrain in the UK.",
   }),
-  wish("wish-conis", "Old Man of Coniston", {
+  wish("wish-conis", "Old Man of Coniston", "Mountains", {
     type: "Mountain", distance: 14, elevation: 803,
     location: "Lake District, England",
     difficulty: 2, badge: "⛰️", gradient: G[7],
@@ -104,42 +105,42 @@ export const suggestedChallenges = [
   // ═══════════════════════════════════════
   // UK ULTRA WALKING
   // ═══════════════════════════════════════
-  wish("wish-thame", "Thames Path 100km", {
+  wish("wish-thame", "Thames Path 100km", "Endurance", {
     type: "Ultra", distance: 100, location: "London → Henley",
     difficulty: 3, badge: "🌊", gradient: G[2],
     appeal: "Flat but relentless. Following the Thames out of London. A completely different 100km to the Lake District.",
   }),
-  wish("wish-r2sto", "Race to the Stones", {
+  wish("wish-r2sto", "Race to the Stones", "Endurance", {
     type: "Ultra", distance: 100, location: "The Ridgeway, England",
     difficulty: 4, badge: "🪨", gradient: G[0],
     appeal: "The UK's biggest ultra along the ancient Ridgeway. Finishes at a 5,000-year-old stone circle.",
   }),
-  wish("wish-lykew", "Lyke Wake Walk", {
+  wish("wish-lykew", "Lyke Wake Walk", "Endurance", {
     type: "Ultra", distance: 61, location: "North York Moors",
     difficulty: 4, badge: "💀", gradient: G[5],
     appeal: "40 miles across the North York Moors in 24 hours. The moors at night are a different world.",
   }),
-  wish("wish-iowch", "Isle of Wight Challenge", {
+  wish("wish-iowch", "Isle of Wight Challenge", "Endurance", {
     type: "Ultra", distance: 106, location: "Isle of Wight",
     difficulty: 4, badge: "🏝️", gradient: G[3],
     appeal: "Full island circumnavigation. Coastal paths, chalk cliffs, and you can see where you started from the finish.",
   }),
-  wish("wish-jurac", "Jurassic Coast 100", {
+  wish("wish-jurac", "Jurassic Coast 100", "Endurance", {
     type: "Ultra", distance: 100, location: "Dorset Coast",
     difficulty: 5, badge: "🦕", gradient: G[6],
     appeal: "Brutal elevation along the Dorset coastline. More climbing than most mountain events. Beautiful and savage.",
   }),
-  wish("wish-norfo", "Norfolk 100km", {
+  wish("wish-norfo", "Norfolk 100km", "Endurance", {
     type: "Ultra", distance: 100, location: "Norfolk Coast",
     difficulty: 3, badge: "🌾", gradient: G[7],
     appeal: "Flat but mentally relentless — no hills to break the monotony. Pure mental endurance training.",
   }),
-  wish("wish-sdw16", "South Downs Way 160km", {
+  wish("wish-sdw16", "South Downs Way 160km", "Endurance", {
     type: "Ultra", distance: 160, location: "Winchester → Eastbourne",
     difficulty: 5, badge: "🚶", gradient: G[1],
     appeal: "The full South Downs Way end-to-end. You've done 50km of it — this is the complete picture.",
   }),
-  wish("wish-cotsw", "Cotswold Way", {
+  wish("wish-cotsw", "Cotswold Way", "Endurance", {
     type: "Ultra", distance: 164, location: "Chipping Campden → Bath",
     difficulty: 4, badge: "🏡", gradient: G[4],
     appeal: "164km through honey-stone villages and rolling Cotswold hills. Quintessentially English.",
@@ -148,43 +149,43 @@ export const suggestedChallenges = [
   // ═══════════════════════════════════════
   // UK MULTI-DAY
   // ═══════════════════════════════════════
-  wish("wish-whway", "West Highland Way", {
+  wish("wish-whway", "West Highland Way", "Multi-Day", {
     type: "Ultra", distance: 154,
     location: "Milngavie → Fort William, Scotland",
     difficulty: 4, badge: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", gradient: G[0],
     appeal: "Scotland's most famous trail. 154km through lochs, moors, and glens. Finishes at the foot of Ben Nevis.",
   }),
-  wish("wish-hadri", "Hadrian's Wall Path", {
+  wish("wish-hadri", "Hadrian's Wall Path", "Multi-Day", {
     type: "Ultra", distance: 135,
     location: "Wallsend → Bowness-on-Solway",
     difficulty: 3, badge: "🏛️", gradient: G[2],
     appeal: "Coast to coast along the Roman wall. 2,000 years of history under your feet.",
   }),
-  wish("wish-c2c00", "Coast to Coast", {
+  wish("wish-c2c00", "Coast to Coast", "Multi-Day", {
     type: "Ultra", distance: 309,
     location: "St Bees → Robin Hood's Bay",
     difficulty: 5, badge: "🌊", gradient: G[4],
     appeal: "Wainwright's masterpiece. 309km across England from the Irish Sea to the North Sea. The big one.",
   }),
-  wish("wish-pennw", "Pennine Way", {
+  wish("wish-pennw", "Pennine Way", "Multi-Day", {
     type: "Ultra", distance: 431,
     location: "Edale → Kirk Yetholm",
     difficulty: 5, badge: "🗻", gradient: G[5],
     appeal: "England's spine. 431km, 16-19 days, and more bog than you'd believe possible. Legendary.",
   }),
-  wish("wish-dalew", "Dales Way", {
+  wish("wish-dalew", "Dales Way", "Multi-Day", {
     type: "Ultra", distance: 128,
     location: "Ilkley → Bowness-on-Windermere",
     difficulty: 3, badge: "🥾", gradient: G[1],
     appeal: "Yorkshire Dales to the Lake District. A gentle multi-day that links two of your favourite landscapes.",
   }),
-  wish("wish-cumbw", "Cumbria Way", {
+  wish("wish-cumbw", "Cumbria Way", "Multi-Day", {
     type: "Ultra", distance: 112,
     location: "Ulverston → Carlisle",
     difficulty: 3, badge: "🥾", gradient: G[3],
     appeal: "Through the heart of the Lake District. 5 days of lakes, fells, and quiet valleys.",
   }),
-  wish("wish-glenw", "Great Glen Way", {
+  wish("wish-glenw", "Great Glen Way", "Multi-Day", {
     type: "Ultra", distance: 127,
     location: "Fort William → Inverness, Scotland",
     difficulty: 3, badge: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", gradient: G[6],
@@ -194,32 +195,32 @@ export const suggestedChallenges = [
   // ═══════════════════════════════════════
   // UK URBAN
   // ═══════════════════════════════════════
-  wish("wish-capri", "London Capital Ring", {
+  wish("wish-capri", "London Capital Ring", "Urban", {
     type: "Urban", distance: 126, location: "Inner London orbital",
     difficulty: 3, badge: "🏙️", gradient: G[7],
     appeal: "The full inner London orbital walk. You've done the Northern Line — this is the whole city.",
   }),
-  wish("wish-lloop", "London LOOP", {
+  wish("wish-lloop", "London LOOP", "Urban", {
     type: "Urban", distance: 242, location: "Outer London orbital",
     difficulty: 4, badge: "🔄", gradient: G[3],
     appeal: "The outer London orbital. 242km through surprisingly green suburbs. London's secret countryside.",
   }),
-  wish("wish-circl", "Circle Line Walk", {
+  wish("wish-circl", "Circle Line Walk", "Urban", {
     type: "Urban", distance: 27, location: "London Circle Line",
     difficulty: 2, badge: "🟡", gradient: G[5],
     appeal: "Another tube line on foot. Shorter than the Northern Line but denser — proper central London streets.",
   }),
-  wish("wish-distr", "District Line Walk", {
+  wish("wish-distr", "District Line Walk", "Urban", {
     type: "Urban", distance: 40, location: "London District Line",
     difficulty: 2, badge: "🟢", gradient: G[4],
     appeal: "The longest tube line walked end-to-end. From Richmond to Upminster across the full width of London.",
   }),
-  wish("wish-m2liv", "Manchester to Liverpool", {
+  wish("wish-m2liv", "Manchester to Liverpool", "Urban", {
     type: "Urban", distance: 56, location: "Manchester → Liverpool",
     difficulty: 3, badge: "🏙️", gradient: G[6],
     appeal: "Two great northern cities connected by foot. Industrial canals, suburbs, and the flat Lancashire plain.",
   }),
-  wish("wish-edin7", "Edinburgh Seven Hills", {
+  wish("wish-edin7", "Edinburgh Seven Hills", "Urban", {
     type: "Urban", distance: 23, location: "Edinburgh, Scotland",
     difficulty: 2, badge: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", gradient: G[0],
     appeal: "Scotland's capital has 7 hills. Summit them all in a single day walk through the city.",
@@ -228,123 +229,123 @@ export const suggestedChallenges = [
   // ═══════════════════════════════════════
   // INTERNATIONAL
   // ═══════════════════════════════════════
-  wish("wish-tmbla", "Tour du Mont Blanc", {
+  wish("wish-tmbla", "Tour du Mont Blanc", "International", {
     type: "Mountain", distance: 170, elevation: 10000,
     location: "France / Italy / Switzerland",
     difficulty: 5, badge: "🏔️", gradient: G[0],
     appeal: "The dream Alpine trek. 170km around Mont Blanc through three countries. The goal after the UK challenges.",
   }),
-  wish("wish-camin", "Camino de Santiago", {
+  wish("wish-camin", "Camino de Santiago", "International", {
     type: "Ultra", distance: 780,
     location: "St-Jean-Pied-de-Port → Santiago, Spain",
     difficulty: 4, badge: "🐚", gradient: G[1],
     appeal: "The pilgrimage. 780km across northern Spain. Not about speed — about the journey changing you.",
   }),
-  wish("wish-ebcmp", "Everest Base Camp Trek", {
+  wish("wish-ebcmp", "Everest Base Camp Trek", "International", {
     type: "Mountain", distance: 130, elevation: 5364,
     location: "Lukla → EBC, Nepal",
     difficulty: 5, badge: "🏔️", gradient: G[2],
     appeal: "Not about distance — about altitude. Standing at the foot of the highest point on Earth.",
   }),
-  wish("wish-kilim", "Kilimanjaro", {
+  wish("wish-kilim", "Kilimanjaro", "International", {
     type: "Mountain", distance: 70, elevation: 5895,
     location: "Tanzania, Africa",
     difficulty: 5, badge: "🌍", gradient: G[3],
     appeal: "The highest point in Africa. Walk from rainforest to arctic summit. No technical climbing — pure endurance.",
   }),
-  wish("wish-gr20x", "GR20 Corsica", {
+  wish("wish-gr20x", "GR20 Corsica", "International", {
     type: "Mountain", distance: 180, elevation: 12000,
     location: "Corsica, France",
     difficulty: 5, badge: "🔥", gradient: G[5],
     appeal: "Europe's toughest long-distance trail. 180km with 12,000m of elevation. Not for the faint-hearted.",
   }),
-  wish("wish-laugv", "Laugavegur Trail", {
+  wish("wish-laugv", "Laugavegur Trail", "International", {
     type: "Mountain", distance: 55, elevation: 1000,
     location: "Iceland",
     difficulty: 3, badge: "🌋", gradient: G[6],
     appeal: "55km through volcanic landscapes, hot springs, and glaciers. Another planet.",
   }),
-  wish("wish-incax", "Inca Trail", {
+  wish("wish-incax", "Inca Trail", "International", {
     type: "Mountain", distance: 43, elevation: 4215,
     location: "Cusco → Machu Picchu, Peru",
     difficulty: 4, badge: "🏛️", gradient: G[7],
     appeal: "The original trek to the lost city. Arriving at Machu Picchu through the Sun Gate at dawn.",
   }),
-  wish("wish-torre", "Torres del Paine W Trek", {
+  wish("wish-torre", "Torres del Paine W Trek", "International", {
     type: "Mountain", distance: 80, elevation: 3000,
     location: "Patagonia, Chile",
     difficulty: 4, badge: "🏔️", gradient: G[4],
     appeal: "The end of the world. Glaciers, granite towers, and Patagonian wind. 80km of raw wilderness.",
   }),
-  wish("wish-haute", "Haute Route", {
+  wish("wish-haute", "Haute Route", "International", {
     type: "Mountain", distance: 180, elevation: 12000,
     location: "Chamonix → Zermatt, Switzerland",
     difficulty: 5, badge: "🇨🇭", gradient: G[0],
     appeal: "Chamonix to Zermatt through the high Alps. 180km of the most spectacular mountain scenery in Europe.",
   }),
-  wish("wish-annap", "Annapurna Circuit", {
+  wish("wish-annap", "Annapurna Circuit", "International", {
     type: "Mountain", distance: 230, elevation: 5416,
     location: "Nepal",
     difficulty: 5, badge: "🏔️", gradient: G[1],
     appeal: "The classic Himalayan circuit. Thorong La Pass at 5,416m. Three weeks of the highest mountains on Earth.",
   }),
-  wish("wish-kungs", "Kungsleden", {
+  wish("wish-kungs", "Kungsleden", "International", {
     type: "Ultra", distance: 440,
     location: "Swedish Lapland",
     difficulty: 4, badge: "🇸🇪", gradient: G[2],
     appeal: "The King's Trail through Arctic Sweden. 440km of midnight sun, reindeer, and total solitude.",
   }),
-  wish("wish-tonga", "Tongariro Alpine Crossing", {
+  wish("wish-tonga", "Tongariro Alpine Crossing", "International", {
     type: "Mountain", distance: 19, elevation: 1000,
     location: "New Zealand",
     difficulty: 3, badge: "🌋", gradient: G[3],
     appeal: "One of the world's greatest day walks. Volcanic craters, emerald lakes, and Mordor landscapes.",
   }),
-  wish("wish-overl", "Overland Track", {
+  wish("wish-overl", "Overland Track", "International", {
     type: "Ultra", distance: 65,
     location: "Tasmania, Australia",
     difficulty: 3, badge: "🇦🇺", gradient: G[4],
     appeal: "65km through Tasmanian wilderness. Ancient forests, mountain plateaus, and no mobile signal.",
   }),
-  wish("wish-routb", "Routeburn Track", {
+  wish("wish-routb", "Routeburn Track", "International", {
     type: "Mountain", distance: 32,
     location: "South Island, New Zealand",
     difficulty: 3, badge: "🇳🇿", gradient: G[5],
     appeal: "A perfect 2-day alpine crossing through NZ's Southern Alps. Fiordland at its finest.",
   }),
-  wish("wish-lycin", "Lycian Way", {
+  wish("wish-lycin", "Lycian Way", "International", {
     type: "Ultra", distance: 540,
     location: "Turkey",
     difficulty: 4, badge: "🇹🇷", gradient: G[6],
     appeal: "540km along Turkey's Mediterranean coast. Ancient ruins, turquoise water, and mountain paths.",
   }),
-  wish("wish-petra", "Petra to Wadi Rum", {
+  wish("wish-petra", "Petra to Wadi Rum", "International", {
     type: "Ultra", distance: 80,
     location: "Jordan",
     difficulty: 3, badge: "🏜️", gradient: G[7],
     appeal: "Desert trekking from the ancient city of Petra to the Martian landscape of Wadi Rum.",
   }),
-  wish("wish-trollt", "Trolltunga", {
+  wish("wish-trollt", "Trolltunga", "International", {
     type: "Mountain", distance: 28, elevation: 800,
     location: "Norway",
     difficulty: 3, badge: "🇳🇴", gradient: G[0],
     appeal: "The iconic troll's tongue rock formation. A long day hike to one of Norway's most dramatic viewpoints.",
   }),
-  wish("wish-mfuji", "Mount Fuji", {
+  wish("wish-mfuji", "Mount Fuji", "International", {
     type: "Mountain", distance: 14, elevation: 3776,
     location: "Japan",
     difficulty: 4, badge: "🗻", gradient: G[1],
     peaks: ["Mount Fuji (3,776m)"],
     appeal: "Japan's sacred mountain. Climb through the night to watch sunrise from the summit.",
   }),
-  wish("wish-toubk", "Mount Toubkal", {
+  wish("wish-toubk", "Mount Toubkal", "International", {
     type: "Mountain", distance: 30, elevation: 4167,
     location: "Atlas Mountains, Morocco",
     difficulty: 4, badge: "🇲🇦", gradient: G[2],
     peaks: ["Toubkal (4,167m)"],
     appeal: "North Africa's highest peak. Desert mountains, Berber villages, and a proper altitude challenge.",
   }),
-  wish("wish-jmuir", "John Muir Trail", {
+  wish("wish-jmuir", "John Muir Trail", "International", {
     type: "Ultra", distance: 340,
     location: "Yosemite → Mt Whitney, California",
     difficulty: 5, badge: "🇺🇸", gradient: G[3],
@@ -354,13 +355,13 @@ export const suggestedChallenges = [
   // ═══════════════════════════════════════
   // RUNNING (unlock that Marathon badge)
   // ═══════════════════════════════════════
-  wish("wish-halfm", "Half Marathon", {
+  wish("wish-halfm", "Half Marathon", "Running", {
     type: "Ultra", distance: 21.1,
     location: "TBC",
     difficulty: 3, badge: "🏃", gradient: G[7],
     appeal: "The gateway to the marathon badge. Walking ultras is harder — but running 21km is a different beast entirely.",
   }),
-  wish("wish-marat", "Marathon", {
+  wish("wish-marat", "Marathon", "Running", {
     type: "Ultra", distance: 42.2,
     location: "TBC",
     difficulty: 4, badge: "🏃", gradient: G[5],
@@ -370,37 +371,37 @@ export const suggestedChallenges = [
   // ═══════════════════════════════════════
   // WILD / EXTREME
   // ═══════════════════════════════════════
-  wish("wish-lejog", "Land's End to John O'Groats", {
+  wish("wish-lejog", "Land's End to John O'Groats", "Extreme", {
     type: "Ultra", distance: 1400,
     location: "Cornwall → Scottish Highlands",
     difficulty: 5, badge: "🇬🇧", gradient: G[5],
     appeal: "The full length of Britain on foot. 1,400km. The ultimate UK endurance challenge. Months of walking.",
   }),
-  wish("wish-200km", "200km Ultra", {
+  wish("wish-200km", "200km Ultra", "Extreme", {
     type: "Ultra", distance: 200,
     location: "TBC",
     difficulty: 5, badge: "🔥", gradient: G[6],
     appeal: "Double your current max distance. 200km is where ultra becomes something else entirely.",
   }),
-  wish("wish-24hr0", "24-Hour Walk Challenge", {
+  wish("wish-24hr0", "24-Hour Walk Challenge", "Extreme", {
     type: "Ultra", distance: null,
     location: "TBC",
     difficulty: 5, badge: "⏱️", gradient: G[7],
     appeal: "Not about distance — about time. Walk as far as you can in exactly 24 hours. Pure endurance measurement.",
   }),
-  wish("wish-bobgr", "Bob Graham Round", {
+  wish("wish-bobgr", "Bob Graham Round", "Extreme", {
     type: "Mountain", distance: 106, elevation: 8200,
     location: "Lake District, England",
     difficulty: 5, badge: "👑", gradient: G[0],
     appeal: "42 peaks, 106km, 8,200m of elevation in 24 hours. The most prestigious fell challenge in Britain.",
   }),
-  wish("wish-mds00", "Marathon des Sables", {
+  wish("wish-mds00", "Marathon des Sables", "Extreme", {
     type: "Ultra", distance: 250,
     location: "Sahara Desert, Morocco",
     difficulty: 5, badge: "🏜️", gradient: G[3],
     appeal: "250km across the Sahara in 6 stages. Self-supported. The toughest footrace on Earth.",
   }),
-  wish("wish-swcp0", "South West Coast Path", {
+  wish("wish-swcp0", "South West Coast Path", "Extreme", {
     type: "Ultra", distance: 1014,
     location: "Minehead → Poole, England",
     difficulty: 5, badge: "🌊", gradient: G[4],

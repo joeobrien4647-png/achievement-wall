@@ -5,13 +5,23 @@ import { useStats } from "../hooks/useStats";
 import { TYPE_COLORS } from "../data/schema";
 import ConfirmDialog from "../components/ConfirmDialog";
 
+const CATEGORIES = [
+  { key: "all", label: "All", icon: "🧭" },
+  { key: "Mountains", label: "Mountains", icon: "⛰️" },
+  { key: "Endurance", label: "Endurance", icon: "🥾" },
+  { key: "Multi-Day", label: "Multi-Day", icon: "🏕️" },
+  { key: "Urban", label: "Urban", icon: "🏙️" },
+  { key: "International", label: "International", icon: "🌍" },
+  { key: "Running", label: "Running", icon: "🏃" },
+  { key: "Extreme", label: "Extreme", icon: "🔥" },
+];
+
 function getRecommendations(stats, completed, wishlist) {
   const recs = [];
   const maxDist = stats.personalRecords?.longestDistance?.value || 0;
   const types = new Set(completed.map((e) => e.type));
   const wishNames = new Set(wishlist.map((e) => e.name.toLowerCase()));
 
-  // Distance progression
   if (maxDist > 0 && maxDist < 160) {
     const next = maxDist <= 50 ? 100 : 160;
     const name = `${next}km Ultra Challenge`;
@@ -19,28 +29,107 @@ function getRecommendations(stats, completed, wishlist) {
       recs.push({ name, type: "Ultra", distance: next, reason: `You've conquered ${maxDist}km — the next frontier is ${next}km` });
     }
   }
-
-  // Type diversity
   if (!types.has("Urban") && !wishNames.has("urban endurance walk")) {
     recs.push({ name: "Urban Endurance Walk", type: "Urban", distance: 50, reason: "You haven't done an urban challenge yet — try the concrete jungle" });
   }
   if (!types.has("Mountain") && !wishNames.has("mountain summit challenge")) {
     recs.push({ name: "Mountain Summit Challenge", type: "Mountain", distance: 30, reason: "No mountain events yet — time to go vertical" });
   }
-
-  // International
   const hasInternational = completed.some((e) => e.location && !["uk", "england", "scotland", "wales", "london", "yorkshire", "lake district", "south downs", "brighton", "fort william"].some((loc) => e.location.toLowerCase().includes(loc)));
   if (!hasInternational && !wishNames.has("international ultra")) {
     recs.push({ name: "International Ultra", type: "Ultra", distance: 100, reason: "All your events are UK-based — take it abroad" });
   }
-
-  // Multi-day
   const hasMultiDay = completed.some((e) => e.distance && e.distance >= 160);
   if (!hasMultiDay && maxDist >= 100 && !wishNames.has("multi-day stage race")) {
     recs.push({ name: "Multi-Day Stage Race", type: "Ultra", distance: 200, reason: "You've done 100km in one go — try spreading it over multiple days" });
   }
-
   return recs.slice(0, 3);
+}
+
+function groupByCategory(events) {
+  const groups = {};
+  for (const e of events) {
+    const cat = e.category || "Custom";
+    if (!groups[cat]) groups[cat] = [];
+    groups[cat].push(e);
+  }
+  return groups;
+}
+
+function WishlistCard({ event, expanded, onToggle, onPromote, onEdit, onDelete }) {
+  return (
+    <div className="bg-gray-800/60 rounded-2xl overflow-hidden border border-gray-700/50">
+      <button onClick={onToggle} className="w-full text-left">
+        <div className="flex">
+          <div
+            className="w-20 h-24 flex items-center justify-center text-3xl flex-shrink-0"
+            style={{ background: event.heroImage }}
+          >
+            {event.badge}
+          </div>
+          <div className="p-3.5 flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <div className="text-white font-bold text-base truncate">{event.name}</div>
+                <div className="flex items-center gap-2 text-xs text-gray-400 mt-0.5">
+                  <span style={{ color: TYPE_COLORS[event.type] }}>{event.type}</span>
+                  {event.distance && <span>{event.distance}km</span>}
+                  {event.elevation && <span>↑{event.elevation}m</span>}
+                </div>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {event.targetYear && (
+                  <span className="bg-indigo-500/15 text-indigo-300 text-[10px] font-bold px-2 py-0.5 rounded">
+                    {event.targetYear}
+                  </span>
+                )}
+                <ChevronDown
+                  size={16}
+                  className={`text-gray-500 transition-transform ${expanded ? "rotate-180" : ""}`}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </button>
+
+      {expanded && (
+        <div className="border-t border-gray-700/50 p-4 space-y-3">
+          {event.appeal && (
+            <div>
+              <div className="text-[10px] uppercase tracking-widest text-emerald-400 font-bold mb-1">
+                Why this appeals
+              </div>
+              <p className="text-gray-300 text-sm">{event.appeal}</p>
+            </div>
+          )}
+          {event.location && (
+            <div className="text-gray-400 text-sm">📍 {event.location}</div>
+          )}
+          <div className="flex gap-2 pt-1">
+            <button
+              onClick={onPromote}
+              className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-600/20 border border-emerald-600/40 text-emerald-400 font-medium text-xs py-2.5 rounded-xl hover:bg-emerald-600/30 transition-colors"
+            >
+              <ArrowUpRight size={14} /> Make Next Target
+            </button>
+            <button
+              onClick={onEdit}
+              className="px-4 bg-gray-700/50 border border-gray-600/50 text-gray-300 text-xs py-2.5 rounded-xl hover:bg-gray-700 transition-colors"
+            >
+              Edit
+            </button>
+            <button
+              onClick={onDelete}
+              className="px-3 bg-gray-700/50 border border-gray-600/50 text-gray-400 text-xs py-2.5 rounded-xl hover:text-red-400 hover:border-red-700/50 transition-colors"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function BucketListPage({ onAddWishlist, onEditEvent }) {
@@ -49,11 +138,11 @@ export default function BucketListPage({ onAddWishlist, onEditEvent }) {
   const { completed } = useEvents();
   const [expandedId, setExpandedId] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [activeCategory, setActiveCategory] = useState("all");
 
   const recommendations = getRecommendations(stats, completed, wishlist);
 
   const promoteToUpcoming = (event) => {
-    // If there's already an upcoming event, swap it to wishlist
     if (upcoming) {
       updateEvent(upcoming.id, { status: "wishlist" });
     }
@@ -65,6 +154,24 @@ export default function BucketListPage({ onAddWishlist, onEditEvent }) {
       progress: 0,
     });
   };
+
+  // Count per category for the pills
+  const categoryCounts = {};
+  for (const e of wishlist) {
+    const cat = e.category || "Custom";
+    categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+  }
+
+  // Filter or group
+  const filtered = activeCategory === "all"
+    ? wishlist
+    : wishlist.filter((e) => (e.category || "Custom") === activeCategory);
+
+  const groups = activeCategory === "all" ? groupByCategory(wishlist) : null;
+
+  // Category display order
+  const categoryOrder = CATEGORIES.map((c) => c.key).filter((k) => k !== "all");
+  categoryOrder.push("Custom");
 
   if (wishlist.length === 0 && recommendations.length === 0) {
     return (
@@ -84,104 +191,85 @@ export default function BucketListPage({ onAddWishlist, onEditEvent }) {
     );
   }
 
+  const renderCard = (event) => (
+    <WishlistCard
+      key={event.id}
+      event={event}
+      expanded={expandedId === event.id}
+      onToggle={() => setExpandedId(expandedId === event.id ? null : event.id)}
+      onPromote={() => promoteToUpcoming(event)}
+      onEdit={() => onEditEvent(event.id)}
+      onDelete={() => setDeleteTarget(event)}
+    />
+  );
+
   return (
     <div className="px-4 pb-24 sm:pb-8 pt-4 relative">
-      <div className="mb-5">
+      <div className="mb-4">
         <h2 className="text-2xl font-black text-white mb-1">Bucket List</h2>
         <p className="text-gray-500 text-sm">
           {wishlist.length} challenge{wishlist.length !== 1 ? "s" : ""} on the horizon
         </p>
       </div>
 
-      {/* Wishlist cards */}
-      <div className="space-y-3 mb-6">
-        {wishlist.map((event) => {
-          const expanded = expandedId === event.id;
+      {/* Category filter pills */}
+      <div className="flex gap-2 overflow-x-auto pb-3 mb-4 -mx-4 px-4 scrollbar-hide">
+        {CATEGORIES.map((cat) => {
+          const count = cat.key === "all" ? wishlist.length : (categoryCounts[cat.key] || 0);
+          if (cat.key !== "all" && count === 0) return null;
+          const active = activeCategory === cat.key;
           return (
-            <div
-              key={event.id}
-              className="bg-gray-800/60 rounded-2xl overflow-hidden border border-gray-700/50"
+            <button
+              key={cat.key}
+              onClick={() => setActiveCategory(cat.key)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0 ${
+                active
+                  ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/25"
+                  : "bg-gray-800/60 text-gray-400 border border-gray-700/50 hover:border-gray-600"
+              }`}
             >
-              <button
-                onClick={() => setExpandedId(expanded ? null : event.id)}
-                className="w-full text-left"
-              >
-                <div className="flex">
-                  <div
-                    className="w-20 h-24 flex items-center justify-center text-3xl flex-shrink-0"
-                    style={{ background: event.heroImage }}
-                  >
-                    {event.badge}
-                  </div>
-                  <div className="p-3.5 flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <div className="text-white font-bold text-base truncate">{event.name}</div>
-                        <div className="flex items-center gap-2 text-xs text-gray-400 mt-0.5">
-                          <span style={{ color: TYPE_COLORS[event.type] }}>{event.type}</span>
-                          {event.distance && <span>{event.distance}km</span>}
-                          {event.elevation && <span>↑{event.elevation}m</span>}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        {event.targetYear && (
-                          <span className="bg-indigo-500/15 text-indigo-300 text-[10px] font-bold px-2 py-0.5 rounded">
-                            {event.targetYear}
-                          </span>
-                        )}
-                        <ChevronDown
-                          size={16}
-                          className={`text-gray-500 transition-transform ${expanded ? "rotate-180" : ""}`}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </button>
-
-              {/* Expanded detail */}
-              {expanded && (
-                <div className="border-t border-gray-700/50 p-4 space-y-3">
-                  {event.appeal && (
-                    <div>
-                      <div className="text-[10px] uppercase tracking-widest text-emerald-400 font-bold mb-1">
-                        Why this appeals
-                      </div>
-                      <p className="text-gray-300 text-sm">{event.appeal}</p>
-                    </div>
-                  )}
-                  {event.location && (
-                    <div className="text-gray-400 text-sm">📍 {event.location}</div>
-                  )}
-                  <div className="flex gap-2 pt-1">
-                    <button
-                      onClick={() => promoteToUpcoming(event)}
-                      className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-600/20 border border-emerald-600/40 text-emerald-400 font-medium text-xs py-2.5 rounded-xl hover:bg-emerald-600/30 transition-colors"
-                    >
-                      <ArrowUpRight size={14} /> Make Next Target
-                    </button>
-                    <button
-                      onClick={() => onEditEvent(event.id)}
-                      className="px-4 bg-gray-700/50 border border-gray-600/50 text-gray-300 text-xs py-2.5 rounded-xl hover:bg-gray-700 transition-colors"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => setDeleteTarget(event)}
-                      className="px-3 bg-gray-700/50 border border-gray-600/50 text-gray-400 text-xs py-2.5 rounded-xl hover:text-red-400 hover:border-red-700/50 transition-colors"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+              <span>{cat.icon}</span>
+              <span>{cat.label}</span>
+              <span className={`text-[10px] ${active ? "text-indigo-200" : "text-gray-600"}`}>
+                {count}
+              </span>
+            </button>
           );
         })}
       </div>
 
+      {/* Grouped view (All selected) */}
+      {groups && (
+        <div className="space-y-6 mb-6">
+          {categoryOrder.map((catKey) => {
+            const items = groups[catKey];
+            if (!items?.length) return null;
+            const catDef = CATEGORIES.find((c) => c.key === catKey);
+            return (
+              <div key={catKey}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-base">{catDef?.icon || "📌"}</span>
+                  <h3 className="text-white font-bold text-sm">{catDef?.label || catKey}</h3>
+                  <span className="text-gray-600 text-xs">{items.length}</span>
+                </div>
+                <div className="space-y-3">
+                  {items.map(renderCard)}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Filtered view (specific category selected) */}
+      {!groups && (
+        <div className="space-y-3 mb-6">
+          {filtered.map(renderCard)}
+        </div>
+      )}
+
       {/* Recommendations */}
-      {recommendations.length > 0 && (
+      {recommendations.length > 0 && activeCategory === "all" && (
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-3">
             <Sparkles size={16} className="text-amber-400" />
