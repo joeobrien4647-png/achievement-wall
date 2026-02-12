@@ -12,8 +12,21 @@ function getInitialState() {
     const storedIds = new Set(storedEvents.map((e) => e.id));
     const newSeedEvents = seedEvents.filter((e) => !storedIds.has(e.id));
 
+    // Build a lookup of seed event metadata to backfill missing fields (e.g. category)
+    const seedLookup = new Map(seedEvents.map((e) => [e.id, e]));
+
+    // Backfill category + appeal on existing events from seed data
+    const patched = storedEvents.map((e) => {
+      const seed = seedLookup.get(e.id);
+      if (!seed) return e;
+      const updates = {};
+      if (!e.category && seed.category) updates.category = seed.category;
+      if (!e.appeal && seed.appeal) updates.appeal = seed.appeal;
+      return Object.keys(updates).length > 0 ? { ...e, ...updates } : e;
+    });
+
     return {
-      events: newSeedEvents.length > 0 ? [...storedEvents, ...newSeedEvents] : storedEvents,
+      events: newSeedEvents.length > 0 ? [...patched, ...newSeedEvents] : patched,
       milestones: stored.milestones ?? seedMilestones,
       radarData: stored.radarData ?? seedRadarData,
       preferences: stored.preferences ?? seedPreferences,

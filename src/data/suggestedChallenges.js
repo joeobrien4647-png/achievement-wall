@@ -407,4 +407,321 @@ export const suggestedChallenges = [
     difficulty: 5, badge: "🌊", gradient: G[4],
     appeal: "1,014km of coastline. England's longest trail. More elevation than the Himalayas. Do it in sections.",
   }),
+
+  // ═══════════════════════════════════════
+  // MOUNTAINS (additional)
+  // ═══════════════════════════════════════
+  wish("wish-bncmd", "Ben Nevis via CMD Arete", "Mountains", {
+    type: "Mountain", distance: 16, elevation: 1345,
+    location: "Fort William, Scotland",
+    difficulty: 5, badge: "🗡️", gradient: G[2],
+    peaks: ["Ben Nevis (1,345m)"],
+    appeal: "You've summited Ben Nevis — now return via the knife-edge CMD Arete. The mountain's true face, not the tourist path.",
+  }),
+  wish("wish-tryfa", "Tryfan", "Mountains", {
+    type: "Mountain", distance: 6, elevation: 918,
+    location: "Snowdonia, Wales",
+    difficulty: 4, badge: "🧗", gradient: G[3],
+    peaks: ["Tryfan (918m)"],
+    appeal: "The only Snowdonia summit you cannot reach without using your hands. Jump between Adam and Eve at the top if you dare.",
+  }),
+  wish("wish-grgab", "Great Gable", "Mountains", {
+    type: "Mountain", distance: 13, elevation: 899,
+    location: "Lake District, England",
+    difficulty: 3, badge: "⛰️", gradient: G[5],
+    peaks: ["Great Gable (899m)"],
+    appeal: "The fell on the Lake District logo. A perfect pyramid with 360-degree views of every major Lakeland summit.",
+  }),
+  wish("wish-shrpe", "Blencathra via Sharp Edge", "Mountains", {
+    type: "Mountain", distance: 12, elevation: 868,
+    location: "Lake District, England",
+    difficulty: 4, badge: "🗡️", gradient: G[6],
+    peaks: ["Blencathra (868m)"],
+    appeal: "Sharp Edge makes Striding Edge look tame. A true Grade 1 scramble with serious exposure. Earn this one.",
+  }),
+  wish("wish-skidd", "Skiddaw", "Mountains", {
+    type: "Mountain", distance: 14, elevation: 931,
+    location: "Lake District, England",
+    difficulty: 2, badge: "⛰️", gradient: G[1],
+    peaks: ["Skiddaw (931m)"],
+    appeal: "One of Lakeland's big four. A straightforward ascent that rewards with views deep into Scotland on a clear day.",
+  }),
+  wish("wish-crsfl", "Cross Fell", "Mountains", {
+    type: "Mountain", distance: 18, elevation: 893,
+    location: "Pennines, England",
+    difficulty: 3, badge: "⛰️", gradient: G[4],
+    peaks: ["Cross Fell (893m)"],
+    appeal: "The highest point in the Pennines. Remote, windswept, and often overlooked. England's forgotten summit.",
+  }),
+  wish("wish-crbgh", "Crib Goch", "Mountains", {
+    type: "Mountain", distance: 12, elevation: 923,
+    location: "Snowdonia, Wales",
+    difficulty: 5, badge: "🔥", gradient: G[0],
+    peaks: ["Crib Goch (923m)"],
+    appeal: "Wales's most exposed ridge. A Grade 1 scramble with thousand-foot drops on both sides. Not a walk — an experience.",
+  }),
+  wish("wish-mamtr", "Mam Tor to Lose Hill Ridge", "Mountains", {
+    type: "Mountain", distance: 11, elevation: 517,
+    location: "Peak District, England",
+    difficulty: 2, badge: "🥾", gradient: G[7],
+    peaks: ["Mam Tor (517m)", "Lose Hill (476m)"],
+    appeal: "The Great Ridge of the Peak District. A perfect half-day skyline walk with the whole of the Hope Valley at your feet.",
+  }),
+
+  // ═══════════════════════════════════════
+  // ENDURANCE (additional)
+  // ═══════════════════════════════════════
+  wish("wish-ridgw", "Ridgeway Challenge", "Endurance", {
+    type: "Ultra", distance: 86,
+    location: "The Ridgeway, Wiltshire → Buckinghamshire",
+    difficulty: 4, badge: "🪨", gradient: G[1],
+    appeal: "86km along Britain's oldest road. Five thousand years of footsteps before yours. Ancient and relentless.",
+  }),
+  wish("wish-peddw", "Peddars Way", "Endurance", {
+    type: "Ultra", distance: 75,
+    location: "Knettishall Heath → Holme-next-the-Sea, Norfolk",
+    difficulty: 3, badge: "🌾", gradient: G[3],
+    appeal: "A Roman road through the quiet heart of Norfolk. Flat, straight, and meditative — pure walking for walking's sake.",
+  }),
+  wish("wish-chilw", "Chiltern Way", "Endurance", {
+    type: "Ultra", distance: 133,
+    location: "Chiltern Hills, Buckinghamshire",
+    difficulty: 4, badge: "🌳", gradient: G[5],
+    appeal: "133km through ancient beechwoods and chalk valleys. Close to London but a world away. England's hidden gem.",
+  }),
+  wish("wish-dwnlk", "Downs Link", "Endurance", {
+    type: "Ultra", distance: 60,
+    location: "Guildford → Shoreham-by-Sea, Surrey to coast",
+    difficulty: 2, badge: "🚂", gradient: G[7],
+    appeal: "60km along a disused railway from the Surrey Hills to the sea. Flat, fast, and finishes on the beach.",
+  }),
+  wish("wish-knavc", "Kennet & Avon Canal", "Endurance", {
+    type: "Ultra", distance: 139,
+    location: "Reading → Bristol",
+    difficulty: 3, badge: "🚢", gradient: G[2],
+    appeal: "139km of towpath from Reading to Bristol. Zero navigation, zero elevation, pure forward momentum.",
+  }),
+  wish("wish-clevw", "Cleveland Way", "Endurance", {
+    type: "Ultra", distance: 175,
+    location: "Helmsley → Filey, North Yorkshire",
+    difficulty: 4, badge: "🌊", gradient: G[4],
+    appeal: "From the North York Moors to dramatic coastal cliffs. 175km of Yorkshire at its most wild and beautiful.",
+  }),
+  wish("wish-ywold", "Yorkshire Wolds Way", "Endurance", {
+    type: "Ultra", distance: 127,
+    location: "Hessle → Filey Brigg, East Yorkshire",
+    difficulty: 3, badge: "🌾", gradient: G[6],
+    appeal: "127km through the rolling chalk hills of East Yorkshire. Quiet, pastoral, and surprisingly hilly for the flatlands.",
+  }),
+  wish("wish-offdy", "Offa's Dyke Path", "Endurance", {
+    type: "Ultra", distance: 285,
+    location: "Sedbury → Prestatyn, Wales/England border",
+    difficulty: 5, badge: "🏴󠁧󠁢󠁷󠁬󠁳󠁿", gradient: G[0],
+    appeal: "285km along the ancient earthwork dividing England and Wales. One foot in each country for two weeks straight.",
+  }),
+
+  // ═══════════════════════════════════════
+  // MULTI-DAY (additional)
+  // ═══════════════════════════════════════
+  wish("wish-rroyw", "Rob Roy Way", "Multi-Day", {
+    type: "Ultra", distance: 127,
+    location: "Drymen → Pitlochry, Scotland",
+    difficulty: 3, badge: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", gradient: G[2],
+    appeal: "Through Rob Roy MacGregor's Highland heartland. Lochs, glens, and whisky distilleries along the way.",
+  }),
+  wish("wish-speyw", "Speyside Way", "Multi-Day", {
+    type: "Ultra", distance: 105,
+    location: "Aviemore → Buckie, Scotland",
+    difficulty: 2, badge: "🥃", gradient: G[4],
+    appeal: "105km following the River Spey through Scotland's whisky country. The most delicious trail in Britain.",
+  }),
+  wish("wish-pembw", "Pembrokeshire Coast Path", "Multi-Day", {
+    type: "Ultra", distance: 299,
+    location: "St Dogmaels → Amroth, Wales",
+    difficulty: 4, badge: "🏴󠁧󠁢󠁷󠁬󠁳󠁿", gradient: G[6],
+    appeal: "299km of the most spectacular coastal scenery in Britain. Wild cliffs, hidden coves, and more seals than people.",
+  }),
+  wish("wish-norcp", "Norfolk Coast Path", "Multi-Day", {
+    type: "Ultra", distance: 84,
+    location: "Hunstanton → Hopton-on-Sea, Norfolk",
+    difficulty: 2, badge: "🦀", gradient: G[7],
+    appeal: "84km of wide skies, salt marshes, and empty beaches. The quietest coastline in England.",
+  }),
+  wish("wish-glynw", "Glyndwr's Way", "Multi-Day", {
+    type: "Ultra", distance: 217,
+    location: "Knighton → Welshpool, Wales",
+    difficulty: 4, badge: "🏴󠁧󠁢󠁷󠁬󠁳󠁿", gradient: G[1],
+    appeal: "217km through the empty green heart of mid-Wales. You might not see another walker for days. True solitude.",
+  }),
+  wish("wish-hoew0", "Heart of England Way", "Multi-Day", {
+    type: "Ultra", distance: 161,
+    location: "Milford Common → Bourton-on-the-Water",
+    difficulty: 3, badge: "🥾", gradient: G[3],
+    appeal: "161km from Staffordshire to the Cotswolds. Through the overlooked middle of England — surprisingly beautiful.",
+  }),
+
+  // ═══════════════════════════════════════
+  // URBAN (additional)
+  // ═══════════════════════════════════════
+  wish("wish-piccl", "Piccadilly Line Walk", "Urban", {
+    type: "Urban", distance: 71,
+    location: "London Piccadilly Line",
+    difficulty: 3, badge: "🔵", gradient: G[0],
+    appeal: "Heathrow to Cockfosters on foot. 71km crossing London diagonally through some of its most iconic neighbourhoods.",
+  }),
+  wish("wish-centl", "Central Line Walk", "Urban", {
+    type: "Urban", distance: 76,
+    location: "London Central Line",
+    difficulty: 3, badge: "🔴", gradient: G[5],
+    appeal: "The longest tube line walked east-to-west. 76km from Epping Forest to the suburbs of Ruislip.",
+  }),
+  wish("wish-bakrl", "Bakerloo Line Walk", "Urban", {
+    type: "Urban", distance: 23,
+    location: "London Bakerloo Line",
+    difficulty: 1, badge: "🟤", gradient: G[7],
+    appeal: "The shortest tube line walk — perfect for a first line challenge. Elephant & Castle to Harrow in a single afternoon.",
+  }),
+  wish("wish-bcanl", "Birmingham Canal Walk", "Urban", {
+    type: "Urban", distance: 35,
+    location: "Birmingham Canal Network",
+    difficulty: 2, badge: "🏙️", gradient: G[3],
+    appeal: "Birmingham has more canals than Venice. 35km exploring the hidden waterways of England's second city.",
+  }),
+  wish("wish-l2lcp", "Leeds to Liverpool Canal", "Urban", {
+    type: "Urban", distance: 204,
+    location: "Leeds → Liverpool",
+    difficulty: 4, badge: "🚢", gradient: G[1],
+    appeal: "204km of towpath linking two great northern cities. Through the Pennines without climbing a single hill.",
+  }),
+  wish("wish-glasw", "Glasgow City Walk", "Urban", {
+    type: "Urban", distance: 25,
+    location: "Glasgow, Scotland",
+    difficulty: 1, badge: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", gradient: G[6],
+    appeal: "25km through Glasgow's Victorian architecture, street art, and riverside. Scotland's grittiest, most vibrant city on foot.",
+  }),
+
+  // ═══════════════════════════════════════
+  // INTERNATIONAL (additional)
+  // ═══════════════════════════════════════
+  wish("wish-dolav", "Dolomites Alta Via 1", "International", {
+    type: "Mountain", distance: 120, elevation: 6500,
+    location: "Dolomites, Italy",
+    difficulty: 4, badge: "🇮🇹", gradient: G[2],
+    appeal: "120km through the most dramatic mountain scenery in Europe. Pale limestone towers, rifugios, and Italian coffee at altitude.",
+  }),
+  wish("wish-pctsc", "Pacific Crest Trail Section", "International", {
+    type: "Ultra", distance: 160,
+    location: "Sierra Nevada, California, USA",
+    difficulty: 5, badge: "🇺🇸", gradient: G[4],
+    appeal: "A taste of the legendary PCT through the High Sierra. Snow-capped passes, crystal lakes, and total wilderness.",
+  }),
+  wish("wish-appsc", "Appalachian Trail Section", "International", {
+    type: "Ultra", distance: 160,
+    location: "White Mountains, New Hampshire, USA",
+    difficulty: 4, badge: "🇺🇸", gradient: G[6],
+    appeal: "The White Mountains section — the toughest stretch of America's most famous trail. Rugged, rooty, and real.",
+  }),
+  wish("wish-olymp", "Mount Olympus", "International", {
+    type: "Mountain", distance: 22, elevation: 2918,
+    location: "Thessaloniki region, Greece",
+    difficulty: 4, badge: "⚡", gradient: G[0],
+    peaks: ["Mytikas (2,918m)"],
+    appeal: "Home of the Greek gods. A scramble to the summit of mythology itself. Where legend meets limestone.",
+  }),
+  wish("wish-cinqt", "Cinque Terre Trail", "International", {
+    type: "Mountain", distance: 12, elevation: 500,
+    location: "Liguria, Italy",
+    difficulty: 2, badge: "🇮🇹", gradient: G[1],
+    appeal: "12km linking five pastel-coloured villages along the Italian Riviera. Short, sweet, and unforgettable.",
+  }),
+  wish("wish-tignx", "Tiger's Nest Hike", "International", {
+    type: "Mountain", distance: 10, elevation: 900,
+    location: "Paro Valley, Bhutan",
+    difficulty: 3, badge: "🐯", gradient: G[5],
+    appeal: "A monastery clinging to a cliff at 3,120m. The most iconic hike in the Himalayan kingdom of Bhutan.",
+  }),
+  wish("wish-elbrs", "Mount Elbrus", "International", {
+    type: "Mountain", distance: 20, elevation: 5642,
+    location: "Caucasus, Russia/Georgia border",
+    difficulty: 5, badge: "🏔️", gradient: G[3],
+    peaks: ["Elbrus (5,642m)"],
+    appeal: "The highest mountain in Europe. A proper high-altitude expedition that bridges trekking and mountaineering.",
+  }),
+  wish("wish-tblmt", "Table Mountain", "International", {
+    type: "Mountain", distance: 11, elevation: 1085,
+    location: "Cape Town, South Africa",
+    difficulty: 2, badge: "🇿🇦", gradient: G[7],
+    peaks: ["Table Mountain (1,085m)"],
+    appeal: "Cape Town's flat-topped icon. Skip the cable car, earn the summit, and watch the Atlantic and Indian Oceans meet.",
+  }),
+  wish("wish-milfd", "Milford Track", "International", {
+    type: "Mountain", distance: 53, elevation: 1154,
+    location: "Fiordland, New Zealand",
+    difficulty: 3, badge: "🇳🇿", gradient: G[2],
+    appeal: "53km through New Zealand's Fiordland. Called the finest walk in the world since 1908 — and it still is.",
+  }),
+
+  // ═══════════════════════════════════════
+  // RUNNING (additional)
+  // ═══════════════════════════════════════
+  wish("wish-parkr", "Parkrun", "Running", {
+    type: "Ultra", distance: 5,
+    location: "Local parkrun",
+    difficulty: 1, badge: "🏃", gradient: G[3],
+    appeal: "5km. Every Saturday morning. Free, timed, and the friendliest running community in the world. Just show up.",
+  }),
+  wish("wish-10krc", "10K Race", "Running", {
+    type: "Ultra", distance: 10,
+    location: "TBC",
+    difficulty: 2, badge: "🏃", gradient: G[1],
+    appeal: "Double the parkrun, double the pain. The 10K is where casual running starts to feel like real racing.",
+  }),
+  wish("wish-ult50", "Ultra Marathon 50km", "Running", {
+    type: "Ultra", distance: 50,
+    location: "TBC",
+    difficulty: 5, badge: "🔥", gradient: G[0],
+    appeal: "Beyond marathon distance. 50km is where running stops being a sport and becomes a conversation with yourself.",
+  }),
+  wish("wish-c25kg", "Couch to 5K Graduation", "Running", {
+    type: "Ultra", distance: 5,
+    location: "Local",
+    difficulty: 1, badge: "🎓", gradient: G[6],
+    appeal: "The first step is the hardest. Nine weeks from zero to 5km. The badge that proves anyone can become a runner.",
+  }),
+
+  // ═══════════════════════════════════════
+  // EXTREME (additional)
+  // ═══════════════════════════════════════
+  wish("wish-paddy", "Paddy Buckley Round", "Extreme", {
+    type: "Mountain", distance: 100, elevation: 8500,
+    location: "Snowdonia, Wales",
+    difficulty: 5, badge: "👑", gradient: G[1],
+    peaks: ["Snowdon", "Tryfan", "Glyder Fawr", "Carnedd Llewelyn"],
+    appeal: "47 peaks, 100km, 8,500m of ascent in 24 hours. The Welsh answer to the Bob Graham Round. Fewer completions, more suffering.",
+  }),
+  wish("wish-ramsy", "Ramsay Round", "Extreme", {
+    type: "Mountain", distance: 93, elevation: 8600,
+    location: "Lochaber, Scotland",
+    difficulty: 5, badge: "👑", gradient: G[2],
+    peaks: ["Ben Nevis", "Aonach Beag", "Carn Mor Dearg"],
+    appeal: "24 Munros in 24 hours. 93km through the wildest terrain in Britain. The Scottish big round — fewer than 200 completions ever.",
+  }),
+  wish("wish-dblbg", "Double Bob Graham", "Extreme", {
+    type: "Mountain", distance: 212, elevation: 16400,
+    location: "Lake District, England",
+    difficulty: 5, badge: "💎", gradient: G[4],
+    appeal: "The Bob Graham Round — twice. 212km, 84 peaks, 16,400m of climbing. For when the single round isn't enough.",
+  }),
+  wish("wish-100mi", "100-Mile Ultra", "Extreme", {
+    type: "Ultra", distance: 161,
+    location: "TBC",
+    difficulty: 5, badge: "💯", gradient: G[6],
+    appeal: "The buckle distance. 100 miles non-stop. Two nights without sleep. The ultimate test of what your body and mind can endure.",
+  }),
+  wish("wish-barkl", "Barkley Marathons", "Extreme", {
+    type: "Ultra", distance: 160, elevation: 18000,
+    location: "Frozen Head State Park, Tennessee, USA",
+    difficulty: 5, badge: "🔥", gradient: G[5],
+    appeal: "The race that eats its runners. 160km with 18,000m of elevation. No trail. No markers. Fewer than 20 finishers in 40 years.",
+  }),
 ];
