@@ -9,12 +9,12 @@ import { TYPE_COLORS, EVENT_TYPES } from "../data/schema";
 import DifficultyStars from "../components/DifficultyStars";
 import TypeBadge from "../components/TypeBadge";
 import ConfirmDialog from "../components/ConfirmDialog";
+import PhotoGallery from "../components/PhotoGallery";
 import { compressImage } from "../lib/photos";
 import { parseTime, formatDuration, calcPace, formatPace } from "../lib/pace";
 
 function EventDetail({ event, onBack, onEdit, onDelete, onUpdatePhotos, onUpdate }) {
   const [showConfirm, setShowConfirm] = useState(false);
-  const [viewingPhoto, setViewingPhoto] = useState(null);
   const [kitInput, setKitInput] = useState("");
   const photos = event.photos || [];
   const kitList = event.kitList || [];
@@ -248,66 +248,52 @@ function EventDetail({ event, onBack, onEdit, onDelete, onUpdatePhotos, onUpdate
             />
           </div>
 
+          {/* Photos */}
           <div className="border-t border-gray-800 p-5">
             <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-3">
               Photos {photos.length > 0 && `(${photos.length}/${maxPhotos})`}
             </div>
-            <div className="grid grid-cols-3 gap-2">
-              {photos.map((src, i) => (
+
+            {photos.length > 0 && (
+              <div className="mb-3">
+                <PhotoGallery photos={photos} />
+              </div>
+            )}
+
+            <div className="flex gap-2 flex-wrap">
+              {photos.map((_, i) => (
                 <button
                   key={i}
-                  onClick={() => setViewingPhoto(src)}
-                  className="aspect-square rounded-xl overflow-hidden relative group"
+                  type="button"
+                  onClick={() => onUpdatePhotos(photos.filter((__, j) => j !== i))}
+                  className="text-[10px] text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-1 rounded-lg hover:bg-red-500/20 transition-colors flex items-center gap-1"
                 >
-                  <img src={src} alt="" className="w-full h-full object-cover" />
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onUpdatePhotos(photos.filter((_, j) => j !== i));
-                    }}
-                    className="absolute top-1 right-1 bg-black/60 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity text-white"
-                  >
-                    <X size={12} />
-                  </button>
+                  <X size={10} /> Photo {i + 1}
                 </button>
               ))}
-              {photos.length < maxPhotos && (
-                <label className="aspect-square bg-gray-800 rounded-xl border-2 border-dashed border-gray-700 flex items-center justify-center cursor-pointer hover:border-gray-500 transition-colors">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      try {
-                        const dataUrl = await compressImage(file);
-                        onUpdatePhotos([...photos, dataUrl]);
-                      } catch { /* ignore */ }
-                      e.target.value = "";
-                    }}
-                  />
-                  <div className="text-center">
-                    <Camera size={18} className="text-gray-600 mx-auto" />
-                    <span className="text-[10px] text-gray-600 mt-1 block">Add</span>
-                  </div>
-                </label>
-              )}
             </div>
-          </div>
 
-          {/* Photo viewer overlay */}
-          {viewingPhoto && (
-            <div
-              className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
-              onClick={() => setViewingPhoto(null)}
-            >
-              <button className="absolute top-4 right-4 text-white/70 hover:text-white">
-                <X size={24} />
-              </button>
-              <img src={viewingPhoto} alt="" className="max-w-full max-h-full rounded-xl object-contain" />
-            </div>
-          )}
+            {photos.length < maxPhotos && (
+              <label className="mt-2 inline-flex items-center gap-2 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 cursor-pointer hover:border-gray-500 transition-colors">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    try {
+                      const dataUrl = await compressImage(file);
+                      onUpdatePhotos([...photos, dataUrl]);
+                    } catch { /* ignore */ }
+                    e.target.value = "";
+                  }}
+                />
+                <Camera size={16} className="text-gray-500" />
+                <span className="text-xs text-gray-400 font-medium">Add photo</span>
+              </label>
+            )}
+          </div>
         </div>
       </div>
 
@@ -683,6 +669,11 @@ export default function EventsPage({ onAddEvent, onEditEvent }) {
                     )}
                     {event.elevation && (
                       <span className="text-gray-400 text-xs">↑{event.elevation}m</span>
+                    )}
+                    {event.photos?.length > 0 && (
+                      <span className="text-gray-500 text-xs flex items-center gap-1">
+                        <Camera size={11} /> {event.photos.length}
+                      </span>
                     )}
                     <div className="ml-auto">
                       <DifficultyStars rating={event.difficulty} />

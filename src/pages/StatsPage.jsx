@@ -1,4 +1,5 @@
-import { Route, TrendingUp, Trophy, Mountain, Flame, Zap, Award } from "lucide-react";
+import { useState, lazy, Suspense } from "react";
+import { Route, TrendingUp, Trophy, Mountain, Flame, Zap, Award, Globe, Map } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis,
@@ -11,6 +12,8 @@ import StatCard from "../components/StatCard";
 import ChartCard from "../components/ChartCard";
 import EventMap from "../components/EventMap";
 import { generateHeatmapData, computeStreaks } from "../lib/streaks";
+
+const LeafletMap = lazy(() => import("../components/LeafletMap"));
 
 const PIE_COLORS = ["#8b5cf6", "#ef4444", "#f59e0b"];
 
@@ -30,6 +33,7 @@ export default function StatsPage() {
   } = useStats();
   const { state } = useData();
   const { completed, upcoming } = useEvents();
+  const [mapMode, setMapMode] = useState("svg");
 
   return (
     <div className="px-4 pb-24 sm:pb-8 pt-4 space-y-5">
@@ -214,11 +218,29 @@ export default function StatsPage() {
       </div>
 
       {/* Event Map */}
-      <ChartCard title="Event Map">
-        <EventMap events={completed} upcoming={upcoming} />
-        <p className="text-center text-gray-500 text-[10px] mt-2">
-          Tap dots for details · Pulsing dot = next target
-        </p>
+      <ChartCard title="Event Map" action={
+        <button
+          onClick={() => setMapMode((m) => m === "svg" ? "leaflet" : "svg")}
+          className="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 font-medium"
+        >
+          {mapMode === "svg" ? <><Globe size={13} /> Interactive</> : <><Map size={13} /> Simple</>}
+        </button>
+      }>
+        {mapMode === "svg" ? (
+          <>
+            <EventMap events={completed} upcoming={upcoming} />
+            <p className="text-center text-gray-500 text-[10px] mt-2">
+              Tap dots for details · Pulsing dot = next target
+            </p>
+          </>
+        ) : (
+          <Suspense fallback={<div className="flex items-center justify-center h-[360px]"><div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" /></div>}>
+            <LeafletMap events={state.events} />
+            <p className="text-center text-gray-500 text-[10px] mt-2">
+              Scroll to zoom · Tap markers for details
+            </p>
+          </Suspense>
+        )}
       </ChartCard>
 
       {/* Activity Heatmap */}

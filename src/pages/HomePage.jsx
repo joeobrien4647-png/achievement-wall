@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { Trophy, Route, TrendingUp, Flame, ArrowRight, ChevronRight, Settings, Download, Upload, RotateCcw, Share2 } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Trophy, Route, TrendingUp, Flame, ArrowRight, ChevronRight, Settings, Download, Upload, RotateCcw, Share2, Moon } from "lucide-react";
 import { daysUntil, countdownLabel } from "../lib/countdown";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts";
 import { useEvents } from "../hooks/useEvents";
@@ -14,6 +14,8 @@ import GoalRing from "../components/GoalRing";
 import ShareCard from "../components/ShareCard";
 import { hasCheckedInThisWeek, addCheckin, computeStreaks } from "../lib/streaks";
 import MotivationCard from "../components/MotivationCard";
+import { checkAchievements } from "../lib/achievements";
+import AchievementToast from "../components/AchievementToast";
 
 const tooltipStyle = {
   backgroundColor: "#1f2937",
@@ -25,7 +27,8 @@ const tooltipStyle = {
 
 export default function HomePage({ setPage }) {
   const { completed, upcoming } = useEvents();
-  const { totalDistance, totalEvents, totalElevation, cumulativeData, yearStats } = useStats();
+  const stats = useStats();
+  const { totalDistance, totalEvents, totalElevation, cumulativeData, yearStats } = stats;
   const { unlocked } = useMilestones();
   const { state, dispatch } = useData();
   const [showSettings, setShowSettings] = useState(false);
@@ -33,7 +36,34 @@ export default function HomePage({ setPage }) {
   const [importStatus, setImportStatus] = useState(null);
   const [editingGoals, setEditingGoals] = useState(false);
   const [showShareCard, setShowShareCard] = useState(false);
+  const [newAchievements, setNewAchievements] = useState([]);
   const fileInputRef = useRef(null);
+
+  // Ensure unlockedAchievements exists in preferences
+  useEffect(() => {
+    if (!state.preferences?.unlockedAchievements) {
+      dispatch({ type: "UPDATE_PREFERENCES", payload: { unlockedAchievements: [] } });
+    }
+  }, [state.preferences?.unlockedAchievements, dispatch]);
+
+  // Check for newly unlocked achievements whenever stats or events change
+  useEffect(() => {
+    if (!state.preferences?.unlockedAchievements) return;
+
+    const freshlyUnlocked = checkAchievements(stats, state.events, state.preferences);
+    if (freshlyUnlocked.length > 0) {
+      setNewAchievements(freshlyUnlocked);
+      dispatch({
+        type: "UPDATE_PREFERENCES",
+        payload: {
+          unlockedAchievements: [
+            ...state.preferences.unlockedAchievements,
+            ...freshlyUnlocked,
+          ],
+        },
+      });
+    }
+  }, [stats, state.events, state.preferences?.unlockedAchievements, dispatch]);
 
   const handleExport = () => exportToJSON(state);
 
@@ -62,6 +92,14 @@ export default function HomePage({ setPage }) {
 
   return (
     <div className="pb-24 sm:pb-8">
+      {/* Achievement Toast */}
+      {newAchievements.length > 0 && (
+        <AchievementToast
+          achievements={newAchievements}
+          onDismiss={() => setNewAchievements([])}
+        />
+      )}
+
       {/* Hero Banner */}
       <div
         className="relative overflow-hidden"
@@ -378,6 +416,26 @@ export default function HomePage({ setPage }) {
       {showSettings && (
         <div className="px-4 mt-6">
           <div className="bg-gray-800/60 rounded-2xl p-5 border border-gray-700/50">
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-3">
+                <Moon size={18} className="text-amber-400" />
+                <div>
+                  <div className="text-white text-sm font-medium">OLED Black Mode</div>
+                  <div className="text-gray-500 text-xs">True black for AMOLED screens</div>
+                </div>
+              </div>
+              <button
+                onClick={() => dispatch({ type: "UPDATE_PREFERENCES", payload: { oledMode: !state.preferences?.oledMode } })}
+                className={`relative w-11 h-6 rounded-full transition-colors ${
+                  state.preferences?.oledMode ? "bg-amber-500" : "bg-gray-600"
+                }`}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
+                  state.preferences?.oledMode ? "translate-x-5" : ""
+                }`} />
+              </button>
+            </div>
+
             <h3 className="text-white font-bold text-sm mb-4">Data Management</h3>
 
             <div className="space-y-3">

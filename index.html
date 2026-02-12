@@ -6,10 +6,45 @@
     <meta name="theme-color" content="#030712" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="description" content="Joe's personal endurance achievement tracker — mountains, ultras, urban walks, and bucket list challenges." />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Joe's Endurance CV" />
+    <meta property="og:description" content="Mountains climbed. Ultras walked. Challenges conquered. An interactive tracker for endurance achievements." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://joeobrien4647-png.github.io/achievement-wall/" />
+    <meta property="og:image" content="https://joeobrien4647-png.github.io/achievement-wall/og-image.png" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Joe's Endurance CV" />
+    <meta name="twitter:description" content="Mountains climbed. Ultras walked. Challenges conquered." />
+
     <title>Joe's Endurance CV</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>" />
-    <link rel="apple-touch-icon" href="/icon-192.svg" />
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/achievement-wall/icon-192.svg" />
+    <link rel="manifest" href="/achievement-wall/manifest.json" />
+
+    <style>
+      /* View transition animations */
+      ::view-transition-old(page) {
+        animation: fade-out 150ms ease-out;
+      }
+      ::view-transition-new(page) {
+        animation: fade-in 150ms ease-in;
+      }
+      @keyframes fade-out {
+        from { opacity: 1; transform: translateY(0); }
+        to   { opacity: 0; transform: translateY(-8px); }
+      }
+      @keyframes fade-in {
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      /* Hide scrollbar on filter pills */
+      .scrollbar-hide::-webkit-scrollbar { display: none; }
+      .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
   </head>
   <body class="bg-gray-950">
     <div id="root"></div>

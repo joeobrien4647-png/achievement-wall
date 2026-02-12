@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { ChevronLeft, X, Plus, Star } from "lucide-react";
+import { ChevronLeft, X, Plus, Star, Camera } from "lucide-react";
 import { useEvents } from "../hooks/useEvents";
 import { EVENT_TYPES, TYPE_COLORS, GRADIENT_PRESETS, createEvent } from "../data/schema";
+import { compressImage } from "../lib/photos";
 import GradientPicker from "../components/GradientPicker";
 import EmojiPicker from "../components/EmojiPicker";
 
@@ -367,6 +368,46 @@ export default function EventFormPage({ eventId, onBack }) {
                 placeholder="What did you learn?"
                 className={`${inputClass} min-h-[80px] resize-y`}
               />
+            </Field>
+
+            {/* Photos */}
+            <Field label={`Photos${(form.photos?.length || 0) > 0 ? ` (${form.photos.length}/5)` : ""}`}>
+              <div className="grid grid-cols-3 gap-2">
+                {(form.photos || []).map((src, i) => (
+                  <div key={i} className="aspect-square rounded-xl overflow-hidden relative group">
+                    <img src={src} alt="" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => set("photos", form.photos.filter((_, j) => j !== i))}
+                      className="absolute top-1 right-1 bg-black/60 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity text-white"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                ))}
+                {(form.photos?.length || 0) < 5 && (
+                  <label className="aspect-square bg-gray-800 rounded-xl border-2 border-dashed border-gray-700 flex items-center justify-center cursor-pointer hover:border-gray-500 transition-colors">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        try {
+                          const dataUrl = await compressImage(file);
+                          set("photos", [...(form.photos || []), dataUrl]);
+                        } catch { /* ignore */ }
+                        e.target.value = "";
+                      }}
+                    />
+                    <div className="text-center">
+                      <Camera size={18} className="text-gray-600 mx-auto" />
+                      <span className="text-[10px] text-gray-600 mt-1 block">Add</span>
+                    </div>
+                  </label>
+                )}
+              </div>
             </Field>
 
             {/* Upcoming-specific fields */}

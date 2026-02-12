@@ -1,11 +1,11 @@
-export function compressImage(file, maxSize = 300) {
+export function compressImage(file, maxWidth = 800) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement("canvas");
-        const scale = Math.min(maxSize / img.width, maxSize / img.height, 1);
+        const scale = Math.min(maxWidth / img.width, 1);
         canvas.width = Math.round(img.width * scale);
         canvas.height = Math.round(img.height * scale);
         const ctx = canvas.getContext("2d");

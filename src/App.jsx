@@ -1,18 +1,34 @@
-import { useState } from "react";
-import { DataProvider } from "./context/DataContext";
+import { useState, useEffect, lazy, Suspense } from "react";
+import { DataProvider, useData } from "./context/DataContext";
 import Nav from "./components/Nav";
-import HomePage from "./pages/HomePage";
-import EventsPage from "./pages/EventsPage";
-import StatsPage from "./pages/StatsPage";
-import MilestonesPage from "./pages/MilestonesPage";
-import NextPage from "./pages/NextPage";
-import BucketListPage from "./pages/BucketListPage";
-import EventFormPage from "./pages/EventFormPage";
+
+const HomePage = lazy(() => import("./pages/HomePage"));
+const EventsPage = lazy(() => import("./pages/EventsPage"));
+const StatsPage = lazy(() => import("./pages/StatsPage"));
+const MilestonesPage = lazy(() => import("./pages/MilestonesPage"));
+const NextPage = lazy(() => import("./pages/NextPage"));
+const BucketListPage = lazy(() => import("./pages/BucketListPage"));
+const EventFormPage = lazy(() => import("./pages/EventFormPage"));
+
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center pt-32">
+      <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+}
 
 function AppShell() {
+  const { state } = useData();
+  const oledMode = state.preferences?.oledMode ?? false;
   const [page, setPage] = useState("home");
   const [editEventId, setEditEventId] = useState(null);
   const [formReturnPage, setFormReturnPage] = useState("events");
+
+  // Apply OLED mode class to <html>
+  useEffect(() => {
+    document.documentElement.classList.toggle("oled-mode", oledMode);
+  }, [oledMode]);
 
   const navigate = (newPage) => {
     if (document.startViewTransition) {
@@ -33,7 +49,6 @@ function AppShell() {
     setEditEventId(null);
     setFormReturnPage("wishlist");
     navigate("form");
-    // Store prefill in sessionStorage so EventFormPage can pick it up
     if (Object.keys(prefill).length > 0) {
       sessionStorage.setItem("formPrefill", JSON.stringify({ status: "wishlist", ...prefill }));
     } else {
@@ -52,20 +67,22 @@ function AppShell() {
   return (
     <div className="bg-gray-950 min-h-screen text-white max-w-2xl mx-auto">
       {showNav && <Nav page={page} setPage={navigate} />}
-      <div style={{ viewTransitionName: "page" }}>
-        {page === "home" && <HomePage setPage={navigate} />}
-        {page === "events" && <EventsPage setPage={navigate} onAddEvent={() => openForm()} onEditEvent={(id) => openForm(id)} />}
-        {page === "stats" && <StatsPage />}
-        {page === "milestones" && <MilestonesPage />}
-        {page === "next" && <NextPage />}
-        {page === "wishlist" && (
-          <BucketListPage
-            onAddWishlist={(prefill) => openWishlistForm(prefill)}
-            onEditEvent={(id) => openForm(id, "wishlist")}
-          />
-        )}
-        {page === "form" && <EventFormPage eventId={editEventId} onBack={closeForm} />}
-      </div>
+      <Suspense fallback={<PageLoader />}>
+        <div style={{ viewTransitionName: "page" }}>
+          {page === "home" && <HomePage setPage={navigate} />}
+          {page === "events" && <EventsPage setPage={navigate} onAddEvent={() => openForm()} onEditEvent={(id) => openForm(id)} />}
+          {page === "stats" && <StatsPage />}
+          {page === "milestones" && <MilestonesPage />}
+          {page === "next" && <NextPage />}
+          {page === "wishlist" && (
+            <BucketListPage
+              onAddWishlist={(prefill) => openWishlistForm(prefill)}
+              onEditEvent={(id) => openForm(id, "wishlist")}
+            />
+          )}
+          {page === "form" && <EventFormPage eventId={editEventId} onBack={closeForm} />}
+        </div>
+      </Suspense>
     </div>
   );
 }

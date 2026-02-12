@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { Plus, ArrowUpRight, Trash2, ChevronDown, Sparkles } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Plus, ArrowUpRight, Trash2, ChevronDown, Sparkles, Search, ArrowUpDown } from "lucide-react";
 import { useEvents } from "../hooks/useEvents";
 import { useStats } from "../hooks/useStats";
 import { TYPE_COLORS } from "../data/schema";
+import { generateTrainingPlan } from "../lib/trainingPlan";
 import ConfirmDialog from "../components/ConfirmDialog";
 
 const CATEGORIES = [
@@ -15,6 +16,30 @@ const CATEGORIES = [
   { key: "Running", label: "Running", icon: "🏃" },
   { key: "Extreme", label: "Extreme", icon: "🔥" },
 ];
+
+const SORT_OPTIONS = [
+  { key: "default", label: "Default" },
+  { key: "distance-asc", label: "Distance ↑" },
+  { key: "distance-desc", label: "Distance ↓" },
+  { key: "difficulty-asc", label: "Easiest first" },
+  { key: "difficulty-desc", label: "Hardest first" },
+  { key: "name", label: "A → Z" },
+];
+
+function DifficultyDots({ level }) {
+  return (
+    <div className="flex gap-0.5">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <div
+          key={n}
+          className={`w-1.5 h-1.5 rounded-full ${
+            n <= level ? "bg-amber-400" : "bg-gray-700"
+          }`}
+        />
+      ))}
+    </div>
+  );
+}
 
 function getRecommendations(stats, completed, wishlist) {
   const recs = [];
@@ -56,6 +81,19 @@ function groupByCategory(events) {
   return groups;
 }
 
+function sortEvents(events, sortKey) {
+  if (sortKey === "default") return events;
+  const sorted = [...events];
+  switch (sortKey) {
+    case "distance-asc": return sorted.sort((a, b) => (a.distance || 0) - (b.distance || 0));
+    case "distance-desc": return sorted.sort((a, b) => (b.distance || 0) - (a.distance || 0));
+    case "difficulty-asc": return sorted.sort((a, b) => (a.difficulty || 0) - (b.difficulty || 0));
+    case "difficulty-desc": return sorted.sort((a, b) => (b.difficulty || 0) - (a.difficulty || 0));
+    case "name": return sorted.sort((a, b) => a.name.localeCompare(b.name));
+    default: return events;
+  }
+}
+
 function WishlistCard({ event, expanded, onToggle, onPromote, onEdit, onDelete }) {
   return (
     <div className="bg-gray-800/60 rounded-2xl overflow-hidden border border-gray-700/50">
@@ -75,6 +113,9 @@ function WishlistCard({ event, expanded, onToggle, onPromote, onEdit, onDelete }
                   <span style={{ color: TYPE_COLORS[event.type] }}>{event.type}</span>
                   {event.distance && <span>{event.distance}km</span>}
                   {event.elevation && <span>↑{event.elevation}m</span>}
+                </div>
+                <div className="mt-1">
+                  <DifficultyDots level={event.difficulty || 0} />
                 </div>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
@@ -139,18 +180,23 @@ export default function BucketListPage({ onAddWishlist, onEditEvent }) {
   const [expandedId, setExpandedId] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [activeCategory, setActiveCategory] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortKey, setSortKey] = useState("default");
+  const [showSort, setShowSort] = useState(false);
 
   const recommendations = getRecommendations(stats, completed, wishlist);
 
   const promoteToUpcoming = (event) => {
     if (upcoming) {
-      updateEvent(upcoming.id, { status: "wishlist" });
+      updateEvent(upcoming.id, { status: "wishlist", trainingPlan: null });
     }
+    const plan = generateTrainingPlan(event);
     updateEvent(event.id, {
       status: "upcoming",
-      trainingWeeks: Array(12).fill(null),
-      phase: "Build Phase",
-      week: "Week 1 of 12",
+      trainingWeeks: Array(plan.totalWeeks).fill(null),
+      trainingPlan: plan,
+      phase: plan.phases[0].name,
+      week: `Week 1 of ${plan.totalWeeks}`,
       progress: 0,
     });
   };
@@ -162,12 +208,27 @@ export default function BucketListPage({ onAddWishlist, onEditEvent }) {
     categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
   }
 
-  // Filter or group
-  const filtered = activeCategory === "all"
-    ? wishlist
-    : wishlist.filter((e) => (e.category || "Custom") === activeCategory);
+  // Filter by category, search, and sort
+  const processedList = useMemo(() => {
+    let list = activeCategory === "all"
+      ? wishlist
+      : wishlist.filter((e) => (e.category || "Custom") === activeCategory);
 
-  const groups = activeCategory === "all" ? groupByCategory(wishlist) : null;
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter((e) =>
+        e.name.toLowerCase().includes(q) ||
+        (e.location && e.location.toLowerCase().includes(q)) ||
+        (e.category && e.category.toLowerCase().includes(q))
+      );
+    }
+
+    return sortEvents(list, sortKey);
+  }, [wishlist, activeCategory, searchQuery, sortKey]);
+
+  const groups = activeCategory === "all" && !searchQuery.trim() && sortKey === "default"
+    ? groupByCategory(processedList)
+    : null;
 
   // Category display order
   const categoryOrder = CATEGORIES.map((c) => c.key).filter((k) => k !== "all");
@@ -212,6 +273,50 @@ export default function BucketListPage({ onAddWishlist, onEditEvent }) {
         </p>
       </div>
 
+      {/* Search & Sort bar */}
+      <div className="flex gap-2 mb-3">
+        <div className="flex-1 relative">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search challenges..."
+            className="w-full bg-gray-800/60 border border-gray-700/50 rounded-xl pl-8 pr-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors"
+          />
+        </div>
+        <div className="relative">
+          <button
+            onClick={() => setShowSort(!showSort)}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
+              sortKey !== "default"
+                ? "bg-indigo-600 text-white"
+                : "bg-gray-800/60 text-gray-400 border border-gray-700/50 hover:border-gray-600"
+            }`}
+          >
+            <ArrowUpDown size={14} />
+            Sort
+          </button>
+          {showSort && (
+            <div className="absolute right-0 top-full mt-1 bg-gray-800 border border-gray-700 rounded-xl overflow-hidden shadow-xl z-50 min-w-[160px]">
+              {SORT_OPTIONS.map((opt) => (
+                <button
+                  key={opt.key}
+                  onClick={() => { setSortKey(opt.key); setShowSort(false); }}
+                  className={`w-full text-left px-3 py-2 text-xs transition-colors ${
+                    sortKey === opt.key
+                      ? "bg-indigo-600/20 text-indigo-300"
+                      : "text-gray-300 hover:bg-gray-700"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Category filter pills */}
       <div className="flex gap-2 overflow-x-auto pb-3 mb-4 -mx-4 px-4 scrollbar-hide">
         {CATEGORIES.map((cat) => {
@@ -238,7 +343,14 @@ export default function BucketListPage({ onAddWishlist, onEditEvent }) {
         })}
       </div>
 
-      {/* Grouped view (All selected) */}
+      {/* Search results count */}
+      {searchQuery.trim() && (
+        <div className="text-gray-500 text-xs mb-3">
+          {processedList.length} result{processedList.length !== 1 ? "s" : ""} for "{searchQuery}"
+        </div>
+      )}
+
+      {/* Grouped view (All selected, no search/sort active) */}
       {groups && (
         <div className="space-y-6 mb-6">
           {categoryOrder.map((catKey) => {
@@ -261,15 +373,22 @@ export default function BucketListPage({ onAddWishlist, onEditEvent }) {
         </div>
       )}
 
-      {/* Filtered view (specific category selected) */}
+      {/* Flat list view (filtered/sorted/searched) */}
       {!groups && (
         <div className="space-y-3 mb-6">
-          {filtered.map(renderCard)}
+          {processedList.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="text-3xl mb-2">🔍</div>
+              <p className="text-gray-500 text-sm">No challenges match your search</p>
+            </div>
+          ) : (
+            processedList.map(renderCard)
+          )}
         </div>
       )}
 
       {/* Recommendations */}
-      {recommendations.length > 0 && activeCategory === "all" && (
+      {recommendations.length > 0 && activeCategory === "all" && !searchQuery.trim() && (
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-3">
             <Sparkles size={16} className="text-amber-400" />

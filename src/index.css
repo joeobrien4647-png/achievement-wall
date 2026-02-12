@@ -11,16 +11,51 @@
 
 /* View Transitions (progressive enhancement) */
 ::view-transition-old(page) {
-  animation: fade-out 120ms ease-out;
+  animation: page-out 150ms ease-out;
 }
 ::view-transition-new(page) {
-  animation: fade-in 120ms ease-in;
+  animation: page-in 150ms ease-in;
 }
-@keyframes fade-out {
-  from { opacity: 1; }
-  to { opacity: 0; }
+@keyframes page-out {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-8px); }
 }
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* OLED Black Mode — true #000 backgrounds for AMOLED screens */
+.oled-mode {
+  --oled-bg: #000000;
+  --oled-card: rgba(17, 17, 17, 0.6);
+  --oled-border: rgba(38, 38, 38, 0.5);
+}
+.oled-mode,
+.oled-mode body {
+  background-color: #000 !important;
+}
+.oled-mode .bg-gray-950 {
+  background-color: #000 !important;
+}
+.oled-mode .bg-gray-900 {
+  background-color: #0a0a0a !important;
+}
+.oled-mode .bg-gray-800\/60,
+.oled-mode .bg-gray-800\/50,
+.oled-mode .bg-gray-800\/40,
+.oled-mode .bg-gray-800\/30 {
+  background-color: var(--oled-card) !important;
+}
+.oled-mode .bg-gray-800 {
+  background-color: #111 !important;
+}
+.oled-mode .border-gray-800,
+.oled-mode .border-gray-700\/50,
+.oled-mode .border-gray-700 {
+  border-color: var(--oled-border) !important;
+}
+.oled-mode .bg-gray-950\/90,
+.oled-mode .bg-gray-950\/95 {
+  background-color: rgba(0, 0, 0, 0.95) !important;
 }
