@@ -15,6 +15,9 @@ import EventShareCard from "../components/EventShareCard";
 import ElevationProfile from "../components/ElevationProfile";
 import { compressImage } from "../lib/photos";
 import { parseTime, formatDuration, calcPace, formatPace } from "../lib/pace";
+import { relativeDate } from "../lib/relativeDate";
+import { useToast } from "../context/ToastContext";
+import { useUndoDelete } from "../hooks/useUndoDelete";
 
 function EventDetail({ event, onBack, onEdit, onDelete, onUpdatePhotos, onUpdate }) {
   const [showConfirm, setShowConfirm] = useState(false);
@@ -382,7 +385,7 @@ function TimelineView({ events, upcoming, onSelect }) {
               </div>
               <div className="text-right flex-shrink-0">
                 <div className="text-gray-500 text-[10px]">
-                  {event.date || "Date TBC"}
+                  {event.date ? relativeDate(event.date) : "Date TBC"}
                 </div>
               </div>
             </div>
@@ -438,6 +441,8 @@ export default function EventsPage({ onAddEvent, onEditEvent }) {
   const [compareIds, setCompareIds] = useState([]);
   const { completed, upcoming, deleteEvent, updateEvent } = useEvents();
   const { totalEvents, totalDistance } = useStats();
+  const toast = useToast();
+  const softDelete = useUndoDelete(deleteEvent, toast.show);
 
   const filtered = useMemo(() => {
     let list = completed;
@@ -480,7 +485,8 @@ export default function EventsPage({ onAddEvent, onEditEvent }) {
         onBack={() => setSelectedId(null)}
         onEdit={onEditEvent}
         onDelete={(id) => {
-          deleteEvent(id);
+          const evt = completed.find((e) => e.id === id);
+          softDelete(id, evt?.name || "Event");
           setSelectedId(null);
         }}
         onUpdatePhotos={(photos) => updateEvent(selected.id, { photos })}

@@ -8,6 +8,9 @@ import EmojiPicker from "../components/EmojiPicker";
 import GpxImport from "../components/GpxImport";
 import KitListEditor from "../components/KitListEditor";
 import { COST_CATEGORIES } from "../components/CostBreakdown";
+import { useFormAutosave, loadDraft, clearDraft } from "../hooks/useFormAutosave";
+import { EVENT_TEMPLATES } from "../lib/eventTemplates";
+import { useToast } from "../context/ToastContext";
 
 function Field({ label, children }) {
   return (
@@ -114,9 +117,13 @@ export default function EventFormPage({ eventId, onBack }) {
   const { getEventById, addEvent, updateEvent } = useEvents();
   const existing = eventId ? getEventById(eventId) : null;
   const isEdit = !!existing;
+  const toast = useToast();
 
   const [form, setForm] = useState(() => {
     if (existing) return { ...existing };
+    // Check for saved draft first
+    const draft = loadDraft(eventId);
+    if (draft) return draft;
     // Check for prefill (e.g. from wishlist recommendations)
     let prefill = {};
     try {
@@ -151,6 +158,9 @@ export default function EventFormPage({ eventId, onBack }) {
     };
   });
 
+  // Auto-save form drafts
+  useFormAutosave(form, eventId);
+
   const [errors, setErrors] = useState([]);
 
   const set = (field, value) => setForm((f) => ({ ...f, [field]: value }));
@@ -182,7 +192,14 @@ export default function EventFormPage({ eventId, onBack }) {
         return;
       }
     }
+    clearDraft(eventId);
+    toast.show(isEdit ? "Event updated" : "Event added!", { type: "success" });
     onBack();
+  };
+
+  const applyTemplate = (template) => {
+    setForm((f) => ({ ...f, ...template.defaults }));
+    toast.show(`${template.label} template applied`, { type: "success" });
   };
 
   const inputClass =
@@ -210,6 +227,28 @@ export default function EventFormPage({ eventId, onBack }) {
             <h2 className="text-xl font-black text-white">
               {isEdit ? "Edit Event" : "New Event"}
             </h2>
+
+            {/* Quick Templates */}
+            {!isEdit && (
+              <div>
+                <label className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 block">
+                  Quick Start
+                </label>
+                <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                  {EVENT_TEMPLATES.map((t) => (
+                    <button
+                      key={t.key}
+                      type="button"
+                      onClick={() => applyTemplate(t)}
+                      className="flex-shrink-0 flex items-center gap-1.5 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-gray-300 hover:border-indigo-500 hover:text-white transition-colors"
+                    >
+                      <span>{t.icon}</span>
+                      <span className="font-medium">{t.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {errors.length > 0 && (
               <div className="bg-red-900/30 border border-red-700/40 rounded-xl p-3">

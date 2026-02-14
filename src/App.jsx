@@ -1,10 +1,14 @@
-import { useState, useEffect, useCallback, lazy, Suspense } from "react";
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import { DataProvider, useData } from "./context/DataContext";
+import { ToastProvider } from "./context/ToastContext";
 import Nav from "./components/Nav";
 import Onboarding from "./components/Onboarding";
 import SkeletonLoader from "./components/SkeletonLoader";
+import OfflineBanner from "./components/OfflineBanner";
 import { hapticLight } from "./lib/haptics";
 import { applyAccentColor, applyLightMode } from "./lib/themes";
+import { startAutoBackup } from "./lib/autoBackup";
+import { useSwipe } from "./hooks/useSwipe";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const EventsPage = lazy(() => import("./pages/EventsPage"));
@@ -49,6 +53,13 @@ function AppShell() {
   useEffect(() => {
     applyLightMode(lightMode && !oledMode);
   }, [lightMode, oledMode]);
+
+  // Auto-backup every 5 minutes
+  const stateRef = useRef(state);
+  stateRef.current = state;
+  useEffect(() => {
+    return startAutoBackup(() => stateRef.current);
+  }, []);
 
   const navigate = useCallback((newPage) => {
     hapticLight();
@@ -109,6 +120,19 @@ function AppShell() {
     navigate(formReturnPage);
   };
 
+  // Swipe navigation between main pages
+  const NAV_PAGES = ["home", "events", "stats", "milestones", "next", "wishlist"];
+  const swipeHandlers = useSwipe(
+    () => {
+      const i = NAV_PAGES.indexOf(page);
+      if (i >= 0 && i < NAV_PAGES.length - 1) navigate(NAV_PAGES[i + 1]);
+    },
+    () => {
+      const i = NAV_PAGES.indexOf(page);
+      if (i > 0) navigate(NAV_PAGES[i - 1]);
+    }
+  );
+
   const showNav = page !== "form";
 
   if (!onboarded) {
@@ -120,7 +144,8 @@ function AppShell() {
   }
 
   return (
-    <div className="bg-gray-950 min-h-screen text-white max-w-2xl mx-auto">
+    <div className="bg-gray-950 min-h-screen text-white max-w-2xl mx-auto" {...swipeHandlers}>
+      <OfflineBanner />
       {showNav && <Nav page={page} setPage={navigate} />}
       <Suspense fallback={<SkeletonLoader />}>
         <div style={{ viewTransitionName: "page" }}>
@@ -150,7 +175,9 @@ function AppShell() {
 export default function App() {
   return (
     <DataProvider>
-      <AppShell />
+      <ToastProvider>
+        <AppShell />
+      </ToastProvider>
     </DataProvider>
   );
 }

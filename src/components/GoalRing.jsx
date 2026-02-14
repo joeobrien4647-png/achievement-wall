@@ -1,12 +1,19 @@
 export default function GoalRing({ value, target, label, unit, color }) {
   const pct = target > 0 ? Math.min(value / target, 1) : 0;
+  const isComplete = value >= target && target > 0;
   const r = 36;
   const circ = 2 * Math.PI * r;
   const offset = circ * (1 - pct);
 
   return (
     <div className="flex flex-col items-center">
-      <svg width="88" height="88" viewBox="0 0 88 88">
+      <svg
+        width="88"
+        height="88"
+        viewBox="0 0 88 88"
+        className={isComplete ? "goal-complete" : ""}
+        style={isComplete ? { "--ring-color": color } : undefined}
+      >
         <circle
           cx="44" cy="44" r={r}
           fill="none" stroke="#1f2937" strokeWidth="6"

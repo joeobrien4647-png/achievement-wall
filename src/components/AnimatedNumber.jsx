@@ -1,24 +1,45 @@
 import { useState, useEffect, useRef } from "react";
 
 /**
- * Animates a number from 0 to `value` over ~1.5s using easeOutExpo.
- * Displays with toLocaleString() formatting.
- * Only animates once on first render.
+ * Animates a number from its previous value to `value` using a spring-like
+ * easeOutExpo curve over ~1s. Re-animates whenever `value` changes.
+ * Respects reduced-motion by skipping animation entirely.
  */
 export default function AnimatedNumber({ value, suffix = "", decimals = 0 }) {
-  const [display, setDisplay] = useState(0);
-  const hasAnimated = useRef(false);
+  const [display, setDisplay] = useState(value || 0);
+  const prevValue = useRef(value || 0);
   const rafRef = useRef(null);
 
   useEffect(() => {
-    if (hasAnimated.current) return;
-    if (typeof value !== "number" || value === 0) {
+    if (typeof value !== "number") {
       setDisplay(value || 0);
       return;
     }
 
-    hasAnimated.current = true;
-    const duration = 1500;
+    // Respect reduced motion — snap immediately
+    const reduced =
+      document.documentElement.classList.contains("reduce-motion") ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      setDisplay(value);
+      prevValue.current = value;
+      return;
+    }
+
+    const from = prevValue.current;
+    const to = value;
+    prevValue.current = value;
+
+    // No animation needed when values match
+    if (from === to) {
+      setDisplay(to);
+      return;
+    }
+
+    // Cancel any in-flight animation
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+
+    const duration = 1000;
     const start = performance.now();
 
     function easeOutExpo(t) {
@@ -29,12 +50,12 @@ export default function AnimatedNumber({ value, suffix = "", decimals = 0 }) {
       const elapsed = now - start;
       const progress = Math.min(elapsed / duration, 1);
       const eased = easeOutExpo(progress);
-      setDisplay(eased * value);
+      setDisplay(from + (to - from) * eased);
 
       if (progress < 1) {
         rafRef.current = requestAnimationFrame(tick);
       } else {
-        setDisplay(value);
+        setDisplay(to);
       }
     }
 
@@ -44,9 +65,10 @@ export default function AnimatedNumber({ value, suffix = "", decimals = 0 }) {
     };
   }, [value]);
 
-  const formatted = decimals > 0
-    ? display.toFixed(decimals)
-    : Math.round(display).toLocaleString();
+  const formatted =
+    decimals > 0
+      ? display.toFixed(decimals)
+      : Math.round(display).toLocaleString();
 
   return (
     <span>

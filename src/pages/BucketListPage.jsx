@@ -5,6 +5,8 @@ import { useStats } from "../hooks/useStats";
 import { TYPE_COLORS } from "../data/schema";
 import { generateTrainingPlan } from "../lib/trainingPlan";
 import ConfirmDialog from "../components/ConfirmDialog";
+import { useToast } from "../context/ToastContext";
+import { useUndoDelete } from "../hooks/useUndoDelete";
 
 const CATEGORIES = [
   { key: "all", label: "All", icon: "🧭" },
@@ -211,6 +213,8 @@ export default function BucketListPage({ onAddWishlist, onEditEvent }) {
   const { wishlist, upcoming, updateEvent, deleteEvent, reorderWishlist } = useEvents();
   const stats = useStats();
   const { completed } = useEvents();
+  const toast = useToast();
+  const softDelete = useUndoDelete(deleteEvent, toast.show);
   const [expandedId, setExpandedId] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [activeCategory, setActiveCategory] = useState("all");
@@ -344,7 +348,10 @@ export default function BucketListPage({ onAddWishlist, onEditEvent }) {
       onToggle={() => setExpandedId(expandedId === event.id ? null : event.id)}
       onPromote={() => promoteToUpcoming(event)}
       onEdit={() => onEditEvent(event.id)}
-      onDelete={() => setDeleteTarget(event)}
+      onDelete={() => {
+        softDelete(event.id, event.name);
+        setExpandedId(null);
+      }}
       reorderMode={false}
     />
   );

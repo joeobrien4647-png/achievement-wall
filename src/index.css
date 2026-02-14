@@ -228,3 +228,36 @@ a:focus:not(:focus-visible) {
 .accent-border { border-color: var(--accent) !important; }
 .accent-bg-10 { background-color: var(--accent-10) !important; }
 .accent-bg-20 { background-color: var(--accent-20) !important; }
+
+/* Toast notifications */
+@keyframes toast-in {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+@keyframes toast-out {
+  from { transform: translateY(0); opacity: 1; }
+  to   { transform: translateY(100%); opacity: 0; }
+}
+.toast-enter { animation: toast-in 200ms ease-out; }
+.toast-exit  { animation: toast-out 200ms ease-in forwards; }
+
+/* Goal ring celebration */
+@keyframes goal-celebrate {
+  0%, 100% { filter: drop-shadow(0 0 0px transparent); }
+  50% { filter: drop-shadow(0 0 12px var(--ring-color, #10b981)); }
+}
+.goal-complete {
+  animation: goal-celebrate 1.5s ease-in-out 3;
+}
+
+/* Offline banner */
+@keyframes slide-down {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(0); }
+}
+@keyframes slide-up {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-100%); }
+}
+.offline-enter { animation: slide-down 300ms ease-out; }
+.offline-exit  { animation: slide-up 300ms ease-in forwards; }

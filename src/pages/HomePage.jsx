@@ -8,7 +8,6 @@ import { useMilestones } from "../hooks/useMilestones";
 import { useData } from "../context/DataContext";
 import { TYPE_COLORS } from "../data/schema";
 import { exportToJSON, importFromJSON } from "../lib/export";
-import { getStorageSize } from "../lib/storage";
 import ConfirmDialog from "../components/ConfirmDialog";
 import GoalRing from "../components/GoalRing";
 import ShareCard from "../components/ShareCard";
@@ -26,7 +25,11 @@ import RecoveryScoreCard from "../components/RecoveryScoreCard";
 import InstagramStoryCard from "../components/InstagramStoryCard";
 import AccentColorPicker from "../components/AccentColorPicker";
 import ProfileEditor from "../components/ProfileEditor";
+import ParallaxHero from "../components/ParallaxHero";
+import StorageQuotaMeter from "../components/StorageQuotaMeter";
 import { exportToCSV } from "../lib/csvExport";
+import { relativeDate } from "../lib/relativeDate";
+import { useToast } from "../context/ToastContext";
 
 const tooltipStyle = {
   backgroundColor: "#1f2937",
@@ -52,6 +55,7 @@ export default function HomePage({ setPage }) {
   const [showIGCard, setShowIGCard] = useState(false);
   const [showProfileEditor, setShowProfileEditor] = useState(false);
   const fileInputRef = useRef(null);
+  const toast = useToast();
 
   // Ensure unlockedAchievements exists in preferences
   useEffect(() => {
@@ -79,7 +83,10 @@ export default function HomePage({ setPage }) {
     }
   }, [stats, state.events, state.preferences?.unlockedAchievements, dispatch]);
 
-  const handleExport = () => exportToJSON(state);
+  const handleExport = () => {
+    exportToJSON(state);
+    toast.show("Data exported successfully", { type: "success" });
+  };
 
   const handleImport = async (e) => {
     const file = e.target.files?.[0];
@@ -87,9 +94,11 @@ export default function HomePage({ setPage }) {
     try {
       const data = await importFromJSON(file);
       dispatch({ type: "IMPORT_DATA", payload: data });
+      toast.show("Data imported successfully!", { type: "success" });
       setImportStatus("success");
       setTimeout(() => setImportStatus(null), 2000);
     } catch (err) {
+      toast.show(err.message, { type: "error" });
       setImportStatus(err.message);
       setTimeout(() => setImportStatus(null), 3000);
     }
@@ -102,8 +111,6 @@ export default function HomePage({ setPage }) {
     setShowSettings(false);
   };
 
-  const storageSizeKB = Math.round(getStorageSize() / 1024);
-
   return (
     <div className="pb-24 sm:pb-8">
       {/* Achievement Toast */}
@@ -115,6 +122,7 @@ export default function HomePage({ setPage }) {
       )}
 
       {/* Hero Banner */}
+      <ParallaxHero>
       <div
         className="relative overflow-hidden"
         style={{
@@ -189,6 +197,7 @@ export default function HomePage({ setPage }) {
           </div>
         </div>
       </div>
+      </ParallaxHero>
 
       {/* Daily Motivation */}
       <div className="px-4 mt-6">
@@ -490,6 +499,7 @@ export default function HomePage({ setPage }) {
                 <div className="text-gray-400 text-xs mt-0.5 flex items-center gap-2">
                   {event.distance && <span>{event.distance}km</span>}
                   <span style={{ color: TYPE_COLORS[event.type] }}>{event.type}</span>
+                  {event.date && <span className="text-gray-500">{relativeDate(event.date)}</span>}
                 </div>
                 {event.completions > 1 && (
                   <span className="inline-block mt-1 bg-indigo-500/20 text-indigo-300 text-[10px] font-bold px-1.5 py-0.5 rounded">
@@ -745,7 +755,7 @@ export default function HomePage({ setPage }) {
               <ProfileExportButton />
 
               <button
-                onClick={() => exportToCSV(state.events)}
+                onClick={() => { exportToCSV(state.events); toast.show("CSV exported", { type: "success" }); }}
                 className="w-full flex items-center gap-3 bg-gray-900/60 rounded-xl p-3 border border-gray-700/30 hover:border-gray-600 transition-colors text-left"
               >
                 <FileSpreadsheet size={18} className="text-teal-400" />
@@ -788,8 +798,8 @@ export default function HomePage({ setPage }) {
               </div>
             )}
 
-            <div className="mt-3 text-center text-gray-600 text-[10px]">
-              Storage: {storageSizeKB}KB used
+            <div className="mt-4">
+              <StorageQuotaMeter />
             </div>
           </div>
         </div>
