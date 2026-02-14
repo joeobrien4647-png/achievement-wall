@@ -67,6 +67,8 @@ export function createEvent(overrides = {}) {
     // Kit & Nutrition
     kitList: [],
     nutritionPlan: "",
+    // Costs
+    costs: { entry: 0, travel: 0, accommodation: 0, gear: 0, food: 0, other: 0 },
     ...overrides,
   };
 }

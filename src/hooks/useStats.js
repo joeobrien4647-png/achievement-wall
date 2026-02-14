@@ -62,12 +62,31 @@ export function useStats() {
     const fastestPaceEvent = withPace[0] || null;
 
     const personalRecords = {
-      longestDistance: longestEvent ? { value: longestEvent.distance, name: longestEvent.name } : null,
-      mostElevation: mostElevationEvent ? { value: mostElevationEvent.elevation, name: mostElevationEvent.name } : null,
-      hardestEvent: hardestEvent ? { value: hardestEvent.difficulty, name: hardestEvent.name } : null,
-      mostCompletions: mostCompletionsEvent ? { value: mostCompletionsEvent.completions, name: mostCompletionsEvent.name } : null,
-      fastestPace: fastestPaceEvent ? { value: formatPace(fastestPaceEvent.pace), name: fastestPaceEvent.name } : null,
+      longestDistance: longestEvent ? { value: longestEvent.distance, name: longestEvent.name, date: longestEvent.date } : null,
+      mostElevation: mostElevationEvent ? { value: mostElevationEvent.elevation, name: mostElevationEvent.name, date: mostElevationEvent.date } : null,
+      hardestEvent: hardestEvent ? { value: hardestEvent.difficulty, name: hardestEvent.name, date: hardestEvent.date } : null,
+      mostCompletions: mostCompletionsEvent ? { value: mostCompletionsEvent.completions, name: mostCompletionsEvent.name, date: mostCompletionsEvent.date } : null,
+      fastestPace: fastestPaceEvent ? { value: formatPace(fastestPaceEvent.pace), name: fastestPaceEvent.name, date: fastestPaceEvent.date } : null,
     };
+
+    // PR Timeline — chronological list of when each record category was first set/broken
+    const prTimeline = [];
+    const datedEvents = events.filter((e) => e.date).sort((a, b) => a.date.localeCompare(b.date));
+    let maxDist = 0, maxElev = 0, maxDiff = 0;
+    for (const e of datedEvents) {
+      if (e.distance && e.distance > maxDist) {
+        maxDist = e.distance;
+        prTimeline.push({ date: e.date, category: "Distance", value: `${e.distance}km`, name: e.name, icon: "🏅", color: "#10b981" });
+      }
+      if (e.elevation && e.elevation > maxElev) {
+        maxElev = e.elevation;
+        prTimeline.push({ date: e.date, category: "Elevation", value: `${e.elevation}m`, name: e.name, icon: "⛰️", color: "#f59e0b" });
+      }
+      if (e.difficulty && e.difficulty > maxDiff) {
+        maxDiff = e.difficulty;
+        prTimeline.push({ date: e.date, category: "Difficulty", value: `${e.difficulty}/5`, name: e.name, icon: "🔥", color: "#ef4444" });
+      }
+    }
 
     // Fun facts
     const cityComparison = totalDistance > 400 ? "Edinburgh" : totalDistance > 300 ? "Manchester" : "Bristol";
@@ -123,6 +142,7 @@ export function useStats() {
       yearStats: { yearDistance, yearElevation, yearEvents: yearEventCount, hasYearDates },
       yoyComparison,
       difficultyProgression,
+      prTimeline,
     };
   }, [events, bodyWeight]);
 }

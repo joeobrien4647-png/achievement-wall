@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { ChevronLeft, X, Plus, Star, Camera } from "lucide-react";
+import { ChevronLeft, X, Plus, Star, Camera, ChevronDown, Package, PoundSterling } from "lucide-react";
 import { useEvents } from "../hooks/useEvents";
 import { EVENT_TYPES, TYPE_COLORS, GRADIENT_PRESETS, createEvent } from "../data/schema";
 import { compressImage } from "../lib/photos";
 import GradientPicker from "../components/GradientPicker";
 import EmojiPicker from "../components/EmojiPicker";
+import KitListEditor from "../components/KitListEditor";
+import { COST_CATEGORIES } from "../components/CostBreakdown";
 
 function Field({ label, children }) {
   return (
@@ -82,6 +84,27 @@ function TagInput({ tags, onChange, placeholder }) {
           <Plus size={16} className="text-gray-400" />
         </button>
       </div>
+    </div>
+  );
+}
+
+function CollapsibleSection({ icon: Icon, title, children, defaultOpen = false }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className="border border-gray-700/50 rounded-xl overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center gap-2.5 px-3.5 py-3 bg-gray-800/40 hover:bg-gray-800/70 transition-colors"
+      >
+        {Icon && <Icon size={16} className="text-gray-400" />}
+        <span className="text-sm font-bold text-white flex-1 text-left">{title}</span>
+        <ChevronDown
+          size={16}
+          className={`text-gray-500 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      {open && <div className="px-3.5 py-3 border-t border-gray-700/50">{children}</div>}
     </div>
   );
 }
@@ -409,6 +432,54 @@ export default function EventFormPage({ eventId, onBack }) {
                 )}
               </div>
             </Field>
+
+            {/* Kit List */}
+            <CollapsibleSection icon={Package} title={`Kit List${(form.kitList?.length || 0) > 0 ? ` (${form.kitList.length})` : ""}`}>
+              <KitListEditor
+                items={form.kitList || []}
+                onChange={(v) => set("kitList", v)}
+                eventType={form.type}
+              />
+            </CollapsibleSection>
+
+            {/* Costs */}
+            <CollapsibleSection icon={PoundSterling} title="Costs">
+              <div className="grid grid-cols-2 gap-3">
+                {COST_CATEGORIES.map((cat) => (
+                  <Field key={cat.key} label={cat.label}>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">£</span>
+                      <input
+                        type="number"
+                        value={form.costs?.[cat.key] || ""}
+                        onChange={(e) =>
+                          set("costs", {
+                            ...(form.costs || {}),
+                            [cat.key]: e.target.value === "" ? 0 : Number(e.target.value),
+                          })
+                        }
+                        placeholder="0"
+                        className={inputClass + " pl-7"}
+                        min="0"
+                        step="0.01"
+                      />
+                    </div>
+                  </Field>
+                ))}
+              </div>
+              {(() => {
+                const total = Object.values(form.costs || {}).reduce(
+                  (sum, v) => sum + (Number(v) || 0),
+                  0
+                );
+                return total > 0 ? (
+                  <div className="mt-3 flex items-center justify-between pt-3 border-t border-gray-700/50">
+                    <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">Total</span>
+                    <span className="text-white font-black text-lg">£{total.toLocaleString()}</span>
+                  </div>
+                ) : null;
+              })()}
+            </CollapsibleSection>
 
             {/* Upcoming-specific fields */}
             {form.status === "upcoming" && (

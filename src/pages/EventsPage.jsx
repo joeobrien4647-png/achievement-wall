@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import {
   MapPin, Route, TrendingUp, Star, Camera, Calendar, Clock,
-  ChevronDown, Plus, Pencil, Trash2, LayoutList, GitBranch, Search, X
+  ChevronDown, Plus, Pencil, Trash2, LayoutList, GitBranch, Search, X, Share2
 } from "lucide-react";
 import { useEvents } from "../hooks/useEvents";
 import { useStats } from "../hooks/useStats";
@@ -10,11 +10,15 @@ import DifficultyStars from "../components/DifficultyStars";
 import TypeBadge from "../components/TypeBadge";
 import ConfirmDialog from "../components/ConfirmDialog";
 import PhotoGallery from "../components/PhotoGallery";
+import EventCompare from "../components/EventCompare";
+import EventShareCard from "../components/EventShareCard";
+import ElevationProfile from "../components/ElevationProfile";
 import { compressImage } from "../lib/photos";
 import { parseTime, formatDuration, calcPace, formatPace } from "../lib/pace";
 
 function EventDetail({ event, onBack, onEdit, onDelete, onUpdatePhotos, onUpdate }) {
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showShareCard, setShowShareCard] = useState(false);
   const [kitInput, setKitInput] = useState("");
   const photos = event.photos || [];
   const kitList = event.kitList || [];
@@ -57,6 +61,12 @@ function EventDetail({ event, onBack, onEdit, onDelete, onUpdatePhotos, onUpdate
                 </div>
               </div>
               <div className="flex gap-2 flex-shrink-0">
+                <button
+                  onClick={() => setShowShareCard(true)}
+                  className="bg-gray-800 border border-gray-700 rounded-xl p-2.5 text-gray-400 hover:text-indigo-400 hover:border-indigo-500 transition-colors"
+                >
+                  <Share2 size={16} />
+                </button>
                 <button
                   onClick={() => onEdit(event.id)}
                   className="bg-gray-800 border border-gray-700 rounded-xl p-2.5 text-gray-400 hover:text-white hover:border-gray-500 transition-colors"
@@ -294,6 +304,20 @@ function EventDetail({ event, onBack, onEdit, onDelete, onUpdatePhotos, onUpdate
               </label>
             )}
           </div>
+
+          {/* Elevation Profile */}
+          {(event.distance || event.elevation) && (
+            <div className="border-t border-gray-800 p-5">
+              <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-3">
+                Elevation Profile
+              </div>
+              <ElevationProfile
+                distance={event.distance}
+                elevation={event.elevation}
+                type={event.type}
+              />
+            </div>
+          )}
         </div>
       </div>
 
@@ -307,6 +331,10 @@ function EventDetail({ event, onBack, onEdit, onDelete, onUpdatePhotos, onUpdate
           }}
           onCancel={() => setShowConfirm(false)}
         />
+      )}
+
+      {showShareCard && (
+        <EventShareCard event={event} onClose={() => setShowShareCard(false)} />
       )}
     </div>
   );
@@ -400,58 +428,6 @@ const SORT_OPTIONS = [
   { key: "dist-asc", label: "Distance ↑" },
   { key: "diff-desc", label: "Difficulty ↓" },
 ];
-
-function CompareOverlay({ eventA, eventB, onClose }) {
-  const metrics = [
-    { label: "Distance", key: "distance", unit: "km", color: "#10b981" },
-    { label: "Elevation", key: "elevation", unit: "m", color: "#f59e0b" },
-    { label: "Difficulty", key: "difficulty", unit: "/5", color: "#ef4444" },
-  ];
-  return (
-    <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-gray-900 rounded-2xl border border-gray-800 max-w-md w-full overflow-hidden" onClick={(e) => e.stopPropagation()}>
-        <div className="flex border-b border-gray-800">
-          {[eventA, eventB].map((ev) => (
-            <div key={ev.id} className="flex-1 p-4 text-center">
-              <div className="text-2xl mb-1">{ev.badge}</div>
-              <div className="text-white font-bold text-sm truncate">{ev.name}</div>
-              <div className="text-gray-500 text-xs mt-0.5" style={{ color: TYPE_COLORS[ev.type] }}>{ev.type}</div>
-            </div>
-          ))}
-        </div>
-        <div className="p-4 space-y-3">
-          {metrics.map((m) => {
-            const a = eventA[m.key] || 0;
-            const b = eventB[m.key] || 0;
-            const max = Math.max(a, b, 1);
-            return (
-              <div key={m.key}>
-                <div className="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1.5">{m.label}</div>
-                <div className="flex items-center gap-3">
-                  <span className={`text-sm font-bold w-16 text-right ${a >= b ? "text-white" : "text-gray-500"}`}>{a}{m.unit}</span>
-                  <div className="flex-1 flex gap-1 h-5">
-                    <div className="flex-1 flex justify-end">
-                      <div className="h-full rounded-l-sm" style={{ width: `${(a / max) * 100}%`, backgroundColor: m.color, opacity: a >= b ? 1 : 0.4 }} />
-                    </div>
-                    <div className="flex-1">
-                      <div className="h-full rounded-r-sm" style={{ width: `${(b / max) * 100}%`, backgroundColor: m.color, opacity: b >= a ? 1 : 0.4 }} />
-                    </div>
-                  </div>
-                  <span className={`text-sm font-bold w-16 ${b >= a ? "text-white" : "text-gray-500"}`}>{b}{m.unit}</span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        <div className="border-t border-gray-800 p-4">
-          <button onClick={onClose} className="w-full py-2.5 rounded-xl bg-gray-800 text-gray-300 text-sm font-medium hover:bg-gray-700 transition-colors">
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function EventsPage({ onAddEvent, onEditEvent }) {
   const [selectedId, setSelectedId] = useState(null);
@@ -700,7 +676,7 @@ export default function EventsPage({ onAddEvent, onEditEvent }) {
         const a = completed.find((e) => e.id === compareIds[0]);
         const b = completed.find((e) => e.id === compareIds[1]);
         return a && b ? (
-          <CompareOverlay eventA={a} eventB={b} onClose={() => setCompareIds([])} />
+          <EventCompare eventA={a} eventB={b} onClose={() => setCompareIds([])} />
         ) : null;
       })()}
     </div>

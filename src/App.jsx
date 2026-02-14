@@ -1,6 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import { DataProvider, useData } from "./context/DataContext";
 import Nav from "./components/Nav";
+import Onboarding from "./components/Onboarding";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const EventsPage = lazy(() => import("./pages/EventsPage"));
@@ -9,6 +10,7 @@ const MilestonesPage = lazy(() => import("./pages/MilestonesPage"));
 const NextPage = lazy(() => import("./pages/NextPage"));
 const BucketListPage = lazy(() => import("./pages/BucketListPage"));
 const EventFormPage = lazy(() => import("./pages/EventFormPage"));
+const WrappedPage = lazy(() => import("./pages/WrappedPage"));
 
 function PageLoader() {
   return (
@@ -19,8 +21,9 @@ function PageLoader() {
 }
 
 function AppShell() {
-  const { state } = useData();
+  const { state, dispatch } = useData();
   const oledMode = state.preferences?.oledMode ?? false;
+  const onboarded = state.preferences?.onboardingComplete ?? false;
   const [page, setPage] = useState("home");
   const [editEventId, setEditEventId] = useState(null);
   const [formReturnPage, setFormReturnPage] = useState("events");
@@ -64,6 +67,14 @@ function AppShell() {
 
   const showNav = page !== "form";
 
+  if (!onboarded) {
+    return (
+      <Onboarding
+        onComplete={() => dispatch({ type: "UPDATE_PREFERENCES", payload: { onboardingComplete: true } })}
+      />
+    );
+  }
+
   return (
     <div className="bg-gray-950 min-h-screen text-white max-w-2xl mx-auto">
       {showNav && <Nav page={page} setPage={navigate} />}
@@ -80,6 +91,7 @@ function AppShell() {
               onEditEvent={(id) => openForm(id, "wishlist")}
             />
           )}
+          {page === "wrapped" && <WrappedPage />}
           {page === "form" && <EventFormPage eventId={editEventId} onBack={closeForm} />}
         </div>
       </Suspense>

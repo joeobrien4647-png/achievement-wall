@@ -25,11 +25,15 @@ function getInitialState() {
       return Object.keys(updates).length > 0 ? { ...e, ...updates } : e;
     });
 
+    // Existing users (have stored data) skip onboarding automatically
+    const prefs = stored.preferences ?? seedPreferences;
+    if (prefs.onboardingComplete === undefined) prefs.onboardingComplete = true;
+
     return {
       events: newSeedEvents.length > 0 ? [...patched, ...newSeedEvents] : patched,
       milestones: stored.milestones ?? seedMilestones,
       radarData: stored.radarData ?? seedRadarData,
-      preferences: stored.preferences ?? seedPreferences,
+      preferences: prefs,
     };
   }
   return {
@@ -72,6 +76,19 @@ function reducer(state, action) {
 
     case "IMPORT_DATA":
       return { ...action.payload };
+
+    case "REORDER_WISHLIST": {
+      const idOrder = new Map(action.payload.orderedIds.map((id, i) => [id, i]));
+      const reordered = [...state.events].sort((a, b) => {
+        const ai = idOrder.get(a.id);
+        const bi = idOrder.get(b.id);
+        if (ai != null && bi != null) return ai - bi;
+        if (ai != null) return -1;
+        if (bi != null) return 1;
+        return 0;
+      });
+      return { ...state, events: reordered };
+    }
 
     case "RESET_TO_SEED":
       return {

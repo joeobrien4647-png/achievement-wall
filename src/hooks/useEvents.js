@@ -35,10 +35,17 @@ export function useEvents() {
     [dispatch]
   );
 
+  const reorderWishlist = useCallback(
+    (orderedIds) => {
+      dispatch({ type: "REORDER_WISHLIST", payload: { orderedIds } });
+    },
+    [dispatch]
+  );
+
   const getEventById = useCallback(
     (id) => events.find((e) => e.id === id) ?? null,
     [events]
   );
 
-  return { events, completed, upcoming, wishlist, addEvent, updateEvent, deleteEvent, getEventById };
+  return { events, completed, upcoming, wishlist, addEvent, updateEvent, deleteEvent, reorderWishlist, getEventById };
 }

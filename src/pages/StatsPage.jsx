@@ -29,7 +29,7 @@ export default function StatsPage() {
   const {
     totalDistance, totalEvents, totalElevation, highestPeak,
     distanceData, cumulativeData, typeBreakdown,
-    personalRecords, funFacts, yoyComparison, difficultyProgression,
+    personalRecords, funFacts, yoyComparison, difficultyProgression, prTimeline,
   } = useStats();
   const { state } = useData();
   const { completed, upcoming } = useEvents();
@@ -83,6 +83,36 @@ export default function StatsPage() {
           ))}
         </div>
       </ChartCard>
+
+      {/* PR Timeline */}
+      {prTimeline.length > 1 && (
+        <ChartCard title="Records Timeline">
+          <div className="relative pl-6">
+            <div className="absolute left-2.5 top-1 bottom-1 w-px bg-gray-700" />
+            {prTimeline.map((pr, i) => (
+              <div key={i} className="relative flex items-start gap-3 pb-4 last:pb-0">
+                <div
+                  className="absolute left-[-18px] top-1 w-3 h-3 rounded-full border-2 border-gray-900 flex-shrink-0"
+                  style={{ backgroundColor: pr.color }}
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">{pr.icon}</span>
+                    <span className="text-white font-bold text-sm" style={{ color: pr.color }}>{pr.value}</span>
+                    <span className="text-gray-500 text-[10px] uppercase tracking-wider">{pr.category} PR</span>
+                  </div>
+                  <div className="text-gray-400 text-xs truncate">{pr.name}</div>
+                  {pr.date && (
+                    <div className="text-gray-600 text-[10px] mt-0.5">
+                      {new Date(pr.date).toLocaleDateString("en-GB", { month: "short", year: "numeric" })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </ChartCard>
+      )}
 
       {/* Year-over-Year Comparison */}
       {yoyComparison.hasData && (

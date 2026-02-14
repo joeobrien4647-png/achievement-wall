@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Trophy, Route, TrendingUp, Flame, ArrowRight, ChevronRight, Settings, Download, Upload, RotateCcw, Share2, Moon } from "lucide-react";
+import { Trophy, Route, TrendingUp, Flame, ArrowRight, ChevronRight, Settings, Download, Upload, RotateCcw, Share2, Moon, Link2, Printer, Sparkles } from "lucide-react";
 import { daysUntil, countdownLabel } from "../lib/countdown";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts";
 import { useEvents } from "../hooks/useEvents";
@@ -16,6 +16,9 @@ import { hasCheckedInThisWeek, addCheckin, computeStreaks } from "../lib/streaks
 import MotivationCard from "../components/MotivationCard";
 import { checkAchievements } from "../lib/achievements";
 import AchievementToast from "../components/AchievementToast";
+import AnimatedNumber from "../components/AnimatedNumber";
+import HeatmapCalendar from "../components/HeatmapCalendar";
+import ShareProfileModal from "../components/ShareProfileModal";
 
 const tooltipStyle = {
   backgroundColor: "#1f2937",
@@ -36,6 +39,7 @@ export default function HomePage({ setPage }) {
   const [importStatus, setImportStatus] = useState(null);
   const [editingGoals, setEditingGoals] = useState(false);
   const [showShareCard, setShowShareCard] = useState(false);
+  const [showShareProfile, setShowShareProfile] = useState(false);
   const [newAchievements, setNewAchievements] = useState([]);
   const fileInputRef = useRef(null);
 
@@ -140,22 +144,26 @@ export default function HomePage({ setPage }) {
 
           <div className="grid grid-cols-4 gap-3 mt-8">
             {[
-              { val: totalEvents, label: "Events", color: "#f59e0b", icon: Trophy },
-              { val: `${totalDistance}km`, label: "Distance", color: "#10b981", icon: Route },
+              { num: totalEvents, suffix: "", label: "Events", color: "#f59e0b", icon: Trophy },
+              { num: totalDistance, suffix: "km", label: "Distance", color: "#10b981", icon: Route },
               {
-                val: `${(totalElevation / 1000).toFixed(1)}k`,
+                num: parseFloat((totalElevation / 1000).toFixed(1)),
+                suffix: "k",
+                decimals: 1,
                 label: "Elev (m)",
                 color: "#8b5cf6",
                 icon: TrendingUp,
               },
-              { val: "100km", label: "Longest", color: "#ef4444", icon: Flame },
+              { num: 100, suffix: "km", label: "Longest", color: "#ef4444", icon: Flame },
             ].map((s, i) => (
               <div
                 key={i}
                 className="bg-white/5 backdrop-blur rounded-xl p-3 border border-white/10"
               >
                 <s.icon size={16} style={{ color: s.color }} className="mx-auto mb-1" />
-                <div className="text-xl font-black text-white">{s.val}</div>
+                <div className="text-xl font-black text-white">
+                  <AnimatedNumber value={s.num} suffix={s.suffix} decimals={s.decimals || 0} />
+                </div>
                 <div className="text-[10px] text-gray-400 uppercase tracking-wider">
                   {s.label}
                 </div>
@@ -412,6 +420,25 @@ export default function HomePage({ setPage }) {
         </div>
       </div>
 
+      {/* Year in Review */}
+      {completed.length >= 3 && (
+        <div className="px-4 mt-6">
+          <button
+            onClick={() => setPage("wrapped")}
+            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-4 border border-indigo-500/30 text-left hover:from-indigo-500 hover:to-purple-500 transition-all active:scale-[0.98]"
+          >
+            <div className="flex items-center gap-3">
+              <Sparkles size={20} className="text-amber-300" />
+              <div>
+                <div className="text-white font-bold text-sm">Year in Review</div>
+                <div className="text-indigo-200 text-xs">Your Wrapped-style journey recap</div>
+              </div>
+              <ArrowRight size={16} className="text-white/60 ml-auto" />
+            </div>
+          </button>
+        </div>
+      )}
+
       {/* Settings Panel */}
       {showSettings && (
         <div className="px-4 mt-6">
@@ -458,6 +485,17 @@ export default function HomePage({ setPage }) {
                 <div>
                   <div className="text-white text-sm font-medium">Import Data</div>
                   <div className="text-gray-500 text-xs">Replace with JSON file</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => window.print()}
+                className="w-full flex items-center gap-3 bg-gray-900/60 rounded-xl p-3 border border-gray-700/30 hover:border-gray-600 transition-colors text-left"
+              >
+                <Printer size={18} className="text-cyan-400" />
+                <div>
+                  <div className="text-white text-sm font-medium">Print / PDF</div>
+                  <div className="text-gray-500 text-xs">Print-friendly view of your CV</div>
                 </div>
               </button>
 
