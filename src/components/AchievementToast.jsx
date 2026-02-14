@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { hapticSuccess } from "../lib/haptics";
 
 /**
  * Lightweight confetti burst rendered on a <canvas>.
@@ -110,7 +111,8 @@ export default function AchievementToast({ achievements, onDismiss }) {
     setQueue(rest);
     setConfettiDone(false);
 
-    // Slide in
+    // Slide in + haptic
+    hapticSuccess();
     requestAnimationFrame(() => setVisible(true));
 
     // Auto-dismiss after 4 seconds

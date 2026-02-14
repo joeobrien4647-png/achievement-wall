@@ -5,6 +5,7 @@ import { EVENT_TYPES, TYPE_COLORS, GRADIENT_PRESETS, createEvent } from "../data
 import { compressImage } from "../lib/photos";
 import GradientPicker from "../components/GradientPicker";
 import EmojiPicker from "../components/EmojiPicker";
+import GpxImport from "../components/GpxImport";
 import KitListEditor from "../components/KitListEditor";
 import { COST_CATEGORIES } from "../components/CostBreakdown";
 
@@ -299,6 +300,16 @@ export default function EventFormPage({ eventId, onBack }) {
                 />
               </Field>
             </div>
+
+            {/* GPX Import */}
+            <Field label="Import GPX Route">
+              <GpxImport
+                onImport={({ distance, elevationGain }) => {
+                  if (distance) set("distance", Math.round(distance * 10) / 10);
+                  if (elevationGain) set("elevation", Math.round(elevationGain));
+                }}
+              />
+            </Field>
 
             {/* Location */}
             <Field label="Location">

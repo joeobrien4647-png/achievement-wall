@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Trophy, Route, TrendingUp, Flame, ArrowRight, ChevronRight, Settings, Download, Upload, RotateCcw, Share2, Moon, Link2, Printer, Sparkles } from "lucide-react";
+import { Trophy, Route, TrendingUp, Flame, ArrowRight, ChevronRight, Settings, Download, Upload, RotateCcw, Share2, Moon, Link2, Printer, Sparkles, Pause, Calendar, Calculator } from "lucide-react";
 import { daysUntil, countdownLabel } from "../lib/countdown";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts";
 import { useEvents } from "../hooks/useEvents";
@@ -19,6 +19,8 @@ import AchievementToast from "../components/AchievementToast";
 import AnimatedNumber from "../components/AnimatedNumber";
 import HeatmapCalendar from "../components/HeatmapCalendar";
 import ShareProfileModal from "../components/ShareProfileModal";
+import WeeklySummary from "../components/WeeklySummary";
+import ProfileExportButton from "../components/ProfileExportButton";
 
 const tooltipStyle = {
   backgroundColor: "#1f2937",
@@ -178,6 +180,11 @@ export default function HomePage({ setPage }) {
         <MotivationCard />
       </div>
 
+      {/* Weekly Summary */}
+      <div className="px-4 mt-4">
+        <WeeklySummary events={state.events} checkins={state.preferences?.weeklyCheckins ?? []} />
+      </div>
+
       {/* Annual Goals */}
       {(() => {
         const goals = state.preferences?.goals ?? { distance: 500, elevation: 5000, events: 10 };
@@ -234,31 +241,154 @@ export default function HomePage({ setPage }) {
         const checkins = state.preferences?.weeklyCheckins ?? [];
         const checked = hasCheckedInThisWeek(checkins);
         const { current, longest } = computeStreaks(checkins);
+
+        // Compute the start date of the current streak
+        const streakStartDate = (() => {
+          if (current === 0 || checkins.length === 0) return null;
+          const sorted = [...new Set(checkins)].sort();
+          // Walk backwards from the end to find the first checkin in the current streak
+          const startIndex = sorted.length - current;
+          if (startIndex >= 0 && startIndex < sorted.length) {
+            const d = new Date(sorted[startIndex]);
+            return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+          }
+          return null;
+        })();
+
+        // Milestones for the streak meter
+        const milestones = [4, 8, 12, 26, 52];
+        const maxMilestone = milestones[milestones.length - 1];
+        const meterProgress = Math.min(current / maxMilestone, 1) * 100;
+
+        // Flame scale: min 1, max 2, based on current streak (reaches max at ~26 weeks)
+        const flameScale = Math.min(2, 1 + (current / 26));
+
         return (
           <div className="px-4 mt-4">
-            <div className="bg-gray-800/60 rounded-2xl p-4 border border-gray-700/50 flex items-center justify-between">
-              <div>
-                <div className="text-white font-bold text-sm">
-                  {current > 0 ? `🔥 ${current} week streak` : "No active streak"}
+            <style>{`
+              @keyframes confetti-burst {
+                0% { transform: translate(0, 0) scale(1); opacity: 1; }
+                100% { transform: translate(var(--cx), var(--cy)) scale(0); opacity: 0; }
+              }
+              @keyframes flame-pulse {
+                0%, 100% { filter: brightness(1); }
+                50% { filter: brightness(1.3); }
+              }
+              .confetti-particle {
+                position: absolute;
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                animation: confetti-burst 0.7s ease-out forwards;
+                pointer-events: none;
+              }
+            `}</style>
+            <div className="bg-gray-800/60 rounded-2xl p-5 border border-gray-700/50">
+              {/* Top row: flame + text + button */}
+              <div className="flex items-center gap-4">
+                {/* Animated flame */}
+                <div
+                  className="text-4xl flex-shrink-0 select-none"
+                  style={{
+                    transform: `scale(${flameScale})`,
+                    transition: "transform 0.5s ease",
+                    animation: current > 0 ? "flame-pulse 2s ease-in-out infinite" : "none",
+                    transformOrigin: "center bottom",
+                  }}
+                >
+                  {current > 0 ? "\uD83D\uDD25" : "\u2744\uFE0F"}
                 </div>
-                <div className="text-gray-500 text-xs mt-0.5">
-                  {longest > 0 ? `Best: ${longest} weeks` : "Check in weekly to build a streak"}
+
+                {/* Streak info */}
+                <div className="flex-1 min-w-0">
+                  <div className="text-white font-black text-xl leading-tight">
+                    {current > 0 ? `${current} week streak` : "No active streak"}
+                  </div>
+                  <div className="text-gray-500 text-xs mt-1">
+                    {current > 0 ? (
+                      <>
+                        Best: {longest} weeks
+                        {streakStartDate && <> &bull; Started: {streakStartDate}</>}
+                      </>
+                    ) : (
+                      "Check in weekly to build a streak"
+                    )}
+                  </div>
+                </div>
+
+                {/* Check-in button with confetti */}
+                <div className="relative flex-shrink-0">
+                  <button
+                    onClick={(e) => {
+                      if (!checked) {
+                        dispatch({ type: "UPDATE_PREFERENCES", payload: { weeklyCheckins: addCheckin(checkins) } });
+                        // Spawn confetti particles
+                        const btn = e.currentTarget;
+                        const container = btn.parentElement;
+                        const colors = ["#f59e0b", "#ef4444", "#10b981", "#8b5cf6", "#3b82f6", "#ec4899", "#14b8a6", "#f97316"];
+                        for (let i = 0; i < 8; i++) {
+                          const particle = document.createElement("div");
+                          particle.className = "confetti-particle";
+                          const angle = (i / 8) * 2 * Math.PI;
+                          const dist = 30 + Math.random() * 20;
+                          particle.style.setProperty("--cx", `${Math.cos(angle) * dist}px`);
+                          particle.style.setProperty("--cy", `${Math.sin(angle) * dist}px`);
+                          particle.style.backgroundColor = colors[i];
+                          particle.style.left = "50%";
+                          particle.style.top = "50%";
+                          particle.style.marginLeft = "-4px";
+                          particle.style.marginTop = "-4px";
+                          container.appendChild(particle);
+                          setTimeout(() => particle.remove(), 700);
+                        }
+                      }
+                    }}
+                    className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+                      checked
+                        ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                        : "bg-indigo-600 hover:bg-indigo-500 text-white active:scale-95"
+                    }`}
+                  >
+                    {checked ? "\u2713 Done" : "I trained"}
+                  </button>
                 </div>
               </div>
-              <button
-                onClick={() => {
-                  if (!checked) {
-                    dispatch({ type: "UPDATE_PREFERENCES", payload: { weeklyCheckins: addCheckin(checkins) } });
-                  }
-                }}
-                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-                  checked
-                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                    : "bg-indigo-600 hover:bg-indigo-500 text-white active:scale-95"
-                }`}
-              >
-                {checked ? "✓ Done" : "I trained"}
-              </button>
+
+              {/* Streak milestone meter */}
+              <div className="mt-4">
+                <div className="relative h-2 bg-gray-900/60 rounded-full overflow-visible">
+                  {/* Progress fill */}
+                  <div
+                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-orange-500 to-amber-400 rounded-full transition-all duration-700"
+                    style={{ width: `${meterProgress}%` }}
+                  />
+                  {/* Milestone markers */}
+                  {milestones.map((m) => {
+                    const pos = (m / maxMilestone) * 100;
+                    const reached = current >= m;
+                    return (
+                      <div
+                        key={m}
+                        className="absolute top-1/2 -translate-y-1/2"
+                        style={{ left: `${pos}%` }}
+                      >
+                        <div
+                          className={`w-3 h-3 rounded-full border-2 -ml-1.5 transition-colors ${
+                            reached
+                              ? "bg-amber-400 border-amber-300"
+                              : "bg-gray-700 border-gray-600"
+                          }`}
+                        />
+                        <div className={`absolute top-4 left-1/2 -translate-x-1/2 text-[9px] font-bold whitespace-nowrap ${
+                          reached ? "text-amber-400" : "text-gray-600"
+                        }`}>
+                          {m}w
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
         );
@@ -463,6 +593,44 @@ export default function HomePage({ setPage }) {
               </button>
             </div>
 
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-3">
+                <Pause size={18} className="text-cyan-400" />
+                <div>
+                  <div className="text-white text-sm font-medium">Reduced Motion</div>
+                  <div className="text-gray-500 text-xs">Disable animations &amp; transitions</div>
+                </div>
+              </div>
+              <button
+                onClick={() => dispatch({ type: "UPDATE_PREFERENCES", payload: { reducedMotion: !state.preferences?.reducedMotion } })}
+                className={`relative w-11 h-6 rounded-full transition-colors ${
+                  state.preferences?.reducedMotion ? "bg-cyan-500" : "bg-gray-600"
+                }`}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
+                  state.preferences?.reducedMotion ? "translate-x-5" : ""
+                }`} />
+              </button>
+            </div>
+
+            <h3 className="text-white font-bold text-sm mb-4">Tools</h3>
+            <div className="grid grid-cols-2 gap-3 mb-5">
+              <button
+                onClick={() => setPage("calendar")}
+                className="flex items-center gap-2 bg-gray-900/60 rounded-xl p-3 border border-gray-700/30 hover:border-gray-600 transition-colors text-left"
+              >
+                <Calendar size={18} className="text-indigo-400" />
+                <div className="text-white text-sm font-medium">Calendar</div>
+              </button>
+              <button
+                onClick={() => setPage("pace")}
+                className="flex items-center gap-2 bg-gray-900/60 rounded-xl p-3 border border-gray-700/30 hover:border-gray-600 transition-colors text-left"
+              >
+                <Calculator size={18} className="text-emerald-400" />
+                <div className="text-white text-sm font-medium">Pace Calc</div>
+              </button>
+            </div>
+
             <h3 className="text-white font-bold text-sm mb-4">Data Management</h3>
 
             <div className="space-y-3">
@@ -498,6 +666,8 @@ export default function HomePage({ setPage }) {
                   <div className="text-gray-500 text-xs">Print-friendly view of your CV</div>
                 </div>
               </button>
+
+              <ProfileExportButton />
 
               <button
                 onClick={() => setShowResetConfirm(true)}

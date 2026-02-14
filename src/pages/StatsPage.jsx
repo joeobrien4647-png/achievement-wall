@@ -183,6 +183,130 @@ export default function StatsPage() {
         </ChartCard>
       )}
 
+      {/* Difficulty Curve */}
+      {difficultyProgression.length > 1 && (
+        <ChartCard title="Your Difficulty Curve">
+          <ResponsiveContainer width="100%" height={200}>
+            <AreaChart data={difficultyProgression}>
+              <defs>
+                <linearGradient id="diffGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#ef4444" stopOpacity={0.3} />
+                  <stop offset="100%" stopColor="#ef4444" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <XAxis dataKey="name" tick={{ fill: "#6b7280", fontSize: 9 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
+              <YAxis domain={[0, 5]} ticks={[1, 2, 3, 4, 5]} tick={{ fill: "#6b7280", fontSize: 10 }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={tooltipStyle} formatter={(v) => [`${v}/5`, "Difficulty"]} />
+              <Area type="monotone" dataKey="difficulty" stroke="#ef4444" strokeWidth={2} fill="url(#diffGrad)" dot={{ fill: "#ef4444", r: 3 }} />
+            </AreaChart>
+          </ResponsiveContainer>
+          <p className="text-center text-gray-500 text-xs mt-1">
+            How your challenge difficulty has evolved over time
+          </p>
+        </ChartCard>
+      )}
+
+      {/* Challenge Chains */}
+      <ChartCard title="Challenge Chains">
+        <div className="space-y-3">
+          {(() => {
+            const completedIds = new Set(
+              state.events.filter((e) => e.status === "completed").map((e) => e.id)
+            );
+            const tubeIds = [
+              "wish-piccl", "wish-centl", "wish-bakrl", "wish-jubll",
+              "wish-nrthl", "wish-victo", "wish-distr", "wish-metrl",
+              "wish-circl", "wish-hammr",
+            ];
+            const chains = [
+              {
+                name: "Three Peaks Master",
+                icon: "🏔️",
+                ids: ["y3p-001", "n3p-004", "wish-w3pk0"],
+                labels: ["Yorkshire 3P", "National 3P", "Welsh 3P"],
+              },
+              {
+                name: "Bob Graham Trilogy",
+                icon: "👑",
+                ids: ["wish-bgr00", "wish-paddy", "wish-ramsy"],
+                labels: ["Bob Graham", "Paddy Buckley", "Ramsay"],
+              },
+              {
+                name: "London Underground",
+                icon: "🚇",
+                ids: tubeIds,
+                labels: tubeIds.map((id) => id.replace("wish-", "").toUpperCase()),
+                threshold: 3,
+              },
+              {
+                name: "Coast to Coast",
+                icon: "🌊",
+                ids: ["wish-hadri", "wish-c2c00"],
+                labels: ["Hadrian's Wall", "Coast to Coast"],
+              },
+              {
+                name: "Lake District Legend",
+                icon: "⛰️",
+                ids: ["wish-helve", "wish-grgab", "wish-skidd", "wish-shrpe"],
+                labels: ["Helvellyn", "Great Gable", "Skiddaw", "Blencathra"],
+              },
+              {
+                name: "Scottish Explorer",
+                icon: "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+                ids: ["wish-whw00", "wish-rroyw", "wish-speyw"],
+                labels: ["West Highland", "Rob Roy", "Speyside"],
+              },
+            ];
+
+            return chains.map((chain) => {
+              const done = chain.ids.filter((id) => completedIds.has(id)).length;
+              const target = chain.threshold || chain.ids.length;
+              const pct = Math.round((done / target) * 100);
+              const isComplete = done >= target;
+
+              return (
+                <div key={chain.name}>
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm">{chain.icon}</span>
+                      <span className={`text-xs font-bold ${isComplete ? "text-emerald-400" : "text-white"}`}>
+                        {chain.name}
+                      </span>
+                    </div>
+                    <span className={`text-[11px] font-mono ${isComplete ? "text-emerald-400" : "text-gray-500"}`}>
+                      {done}/{target}
+                    </span>
+                  </div>
+                  <div className="h-1.5 bg-gray-700/60 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{
+                        width: `${pct}%`,
+                        backgroundColor: isComplete ? "#10b981" : "#8b5cf6",
+                      }}
+                    />
+                  </div>
+                  <div className="flex flex-wrap gap-1 mt-1.5">
+                    {chain.ids.map((id, i) => (
+                      <span
+                        key={id}
+                        className={`text-[9px] px-1.5 py-0.5 rounded-full ${
+                          completedIds.has(id)
+                            ? "bg-emerald-500/20 text-emerald-400"
+                            : "bg-gray-700/40 text-gray-500"
+                        }`}
+                      >
+                        {chain.labels[i]}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              );
+            });
+          })()}
+        </div>
+      </ChartCard>
+
       {/* Distance Chart */}
       <ChartCard title="Distance by Event">
         <ResponsiveContainer width="100%" height={200}>

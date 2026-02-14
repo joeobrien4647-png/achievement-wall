@@ -1,3 +1,5 @@
+import { hapticHeavy } from "../lib/haptics";
+
 export default function ConfirmDialog({ title, message, onConfirm, onCancel, confirmLabel = "Delete", danger = true }) {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm px-6">
@@ -12,7 +14,7 @@ export default function ConfirmDialog({ title, message, onConfirm, onCancel, con
             Cancel
           </button>
           <button
-            onClick={onConfirm}
+            onClick={() => { hapticHeavy(); onConfirm(); }}
             className={`flex-1 py-2.5 rounded-xl font-medium text-sm transition-colors ${
               danger
                 ? "bg-red-600 text-white hover:bg-red-500"

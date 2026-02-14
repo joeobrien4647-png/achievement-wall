@@ -123,6 +123,94 @@ const achievements = [
       return promoted.length >= 3;
     },
   },
+
+  // ─── Challenge Chains ─────────────────────────────────
+  {
+    id: "chain-3-peaks",
+    name: "Three Peaks Master",
+    icon: "🏔️",
+    description: "Complete the Yorkshire, National, and Welsh 3 Peaks",
+    check: (_stats, events) => {
+      const done = new Set(
+        events.filter((e) => e.status === "completed").map((e) => e.id)
+      );
+      return done.has("y3p-001") && done.has("n3p-004") && done.has("wish-w3pk0");
+    },
+  },
+  {
+    id: "chain-bg-trilogy",
+    name: "Bob Graham Trilogy",
+    icon: "👑",
+    description: "Complete the Bob Graham, Paddy Buckley, and Ramsay Rounds",
+    check: (_stats, events) => {
+      const done = new Set(
+        events.filter((e) => e.status === "completed").map((e) => e.id)
+      );
+      return (
+        done.has("wish-bgr00") && done.has("wish-paddy") && done.has("wish-ramsy")
+      );
+    },
+  },
+  {
+    id: "chain-london-underground",
+    name: "London Underground",
+    icon: "🚇",
+    description: "Complete 3 or more tube line walks",
+    check: (_stats, events) => {
+      const tubePrefixes = [
+        "wish-piccl", "wish-centl", "wish-bakrl", "wish-jubll",
+        "wish-nrthl", "wish-victo", "wish-distr", "wish-metrl",
+        "wish-circl", "wish-hammr",
+      ];
+      const completed = events.filter(
+        (e) => e.status === "completed" && tubePrefixes.some((p) => e.id.startsWith(p))
+      );
+      return completed.length >= 3;
+    },
+  },
+  {
+    id: "chain-coast-to-coast",
+    name: "Coast to Coast",
+    icon: "🌊",
+    description: "Complete Hadrian's Wall and the Coast to Coast Walk",
+    check: (_stats, events) => {
+      const done = new Set(
+        events.filter((e) => e.status === "completed").map((e) => e.id)
+      );
+      return done.has("wish-hadri") && done.has("wish-c2c00");
+    },
+  },
+  {
+    id: "chain-lake-district",
+    name: "Lake District Legend",
+    icon: "⛰️",
+    description: "Summit Helvellyn, Great Gable, Skiddaw, and Blencathra",
+    check: (_stats, events) => {
+      const done = new Set(
+        events.filter((e) => e.status === "completed").map((e) => e.id)
+      );
+      return (
+        done.has("wish-helve") &&
+        done.has("wish-grgab") &&
+        done.has("wish-skidd") &&
+        done.has("wish-shrpe")
+      );
+    },
+  },
+  {
+    id: "chain-scottish-explorer",
+    name: "Scottish Explorer",
+    icon: "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+    description: "Complete the West Highland Way, Rob Roy Way, and Speyside Way",
+    check: (_stats, events) => {
+      const done = new Set(
+        events.filter((e) => e.status === "completed").map((e) => e.id)
+      );
+      return (
+        done.has("wish-whw00") && done.has("wish-rroyw") && done.has("wish-speyw")
+      );
+    },
+  },
 ];
 
 /**
