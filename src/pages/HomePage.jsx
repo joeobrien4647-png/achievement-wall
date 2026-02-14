@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Trophy, Route, TrendingUp, Flame, ArrowRight, ChevronRight, Settings, Download, Upload, RotateCcw, Share2, Moon, Link2, Printer, Sparkles, Pause, Calendar, Calculator } from "lucide-react";
+import { Trophy, Route, TrendingUp, Flame, ArrowRight, ChevronRight, Settings, Download, Upload, RotateCcw, Share2, Moon, Link2, Printer, Sparkles, Pause, Calendar, Calculator, Sun, Instagram, FileSpreadsheet, User, Footprints, Map } from "lucide-react";
 import { daysUntil, countdownLabel } from "../lib/countdown";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts";
 import { useEvents } from "../hooks/useEvents";
@@ -21,6 +21,12 @@ import HeatmapCalendar from "../components/HeatmapCalendar";
 import ShareProfileModal from "../components/ShareProfileModal";
 import WeeklySummary from "../components/WeeklySummary";
 import ProfileExportButton from "../components/ProfileExportButton";
+import CountdownWidget from "../components/CountdownWidget";
+import RecoveryScoreCard from "../components/RecoveryScoreCard";
+import InstagramStoryCard from "../components/InstagramStoryCard";
+import AccentColorPicker from "../components/AccentColorPicker";
+import ProfileEditor from "../components/ProfileEditor";
+import { exportToCSV } from "../lib/csvExport";
 
 const tooltipStyle = {
   backgroundColor: "#1f2937",
@@ -43,6 +49,8 @@ export default function HomePage({ setPage }) {
   const [showShareCard, setShowShareCard] = useState(false);
   const [showShareProfile, setShowShareProfile] = useState(false);
   const [newAchievements, setNewAchievements] = useState([]);
+  const [showIGCard, setShowIGCard] = useState(false);
+  const [showProfileEditor, setShowProfileEditor] = useState(false);
   const fileInputRef = useRef(null);
 
   // Ensure unlockedAchievements exists in preferences
@@ -136,12 +144,19 @@ export default function HomePage({ setPage }) {
               <Settings size={18} />
             </button>
           </div>
-          <div className="text-5xl mb-4">🏆</div>
+          {/* Profile photo or trophy */}
+          {state.preferences?.profile?.photo ? (
+            <button onClick={() => setShowProfileEditor(true)} className="mx-auto mb-4">
+              <img src={state.preferences.profile.photo} alt="" className="w-20 h-20 rounded-full border-2 border-white/20 object-cover" />
+            </button>
+          ) : (
+            <div className="text-5xl mb-4">🏆</div>
+          )}
           <h1 className="text-3xl font-black tracking-tight text-white mb-2">
-            JOE'S ENDURANCE CV
+            {state.preferences?.profile?.name ? `${state.preferences.profile.name.toUpperCase()}'S ENDURANCE CV` : "JOE'S ENDURANCE CV"}
           </h1>
           <p className="text-gray-400 text-sm leading-relaxed">
-            Every kilometre earned. Every peak conquered. Every wall broken through.
+            {state.preferences?.profile?.tagline || "Every kilometre earned. Every peak conquered. Every wall broken through."}
           </p>
 
           <div className="grid grid-cols-4 gap-3 mt-8">
@@ -183,6 +198,11 @@ export default function HomePage({ setPage }) {
       {/* Weekly Summary */}
       <div className="px-4 mt-4">
         <WeeklySummary events={state.events} checkins={state.preferences?.weeklyCheckins ?? []} />
+      </div>
+
+      {/* Recovery Score */}
+      <div className="px-4 mt-4">
+        <RecoveryScoreCard events={state.events} />
       </div>
 
       {/* Annual Goals */}
@@ -432,6 +452,13 @@ export default function HomePage({ setPage }) {
         </div>
       )}
 
+      {/* Countdown Widget */}
+      {upcoming && (
+        <div className="px-4 mt-4">
+          <CountdownWidget event={upcoming} />
+        </div>
+      )}
+
       {/* Recent Events Preview */}
       <div className="px-4 mt-6">
         <div className="flex items-center justify-between mb-3">
@@ -613,6 +640,33 @@ export default function HomePage({ setPage }) {
               </button>
             </div>
 
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-3">
+                <Sun size={18} className="text-amber-300" />
+                <div>
+                  <div className="text-white text-sm font-medium">Light Mode</div>
+                  <div className="text-gray-500 text-xs">Bright theme for daylight</div>
+                </div>
+              </div>
+              <button
+                onClick={() => dispatch({ type: "UPDATE_PREFERENCES", payload: { lightMode: !state.preferences?.lightMode } })}
+                className={`relative w-11 h-6 rounded-full transition-colors ${
+                  state.preferences?.lightMode ? "bg-amber-400" : "bg-gray-600"
+                }`}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
+                  state.preferences?.lightMode ? "translate-x-5" : ""
+                }`} />
+              </button>
+            </div>
+
+            <div className="mb-5">
+              <AccentColorPicker
+                value={state.preferences?.accentColor ?? "#6366f1"}
+                onChange={(hex) => dispatch({ type: "UPDATE_PREFERENCES", payload: { accentColor: hex } })}
+              />
+            </div>
+
             <h3 className="text-white font-bold text-sm mb-4">Tools</h3>
             <div className="grid grid-cols-2 gap-3 mb-5">
               <button
@@ -628,6 +682,27 @@ export default function HomePage({ setPage }) {
               >
                 <Calculator size={18} className="text-emerald-400" />
                 <div className="text-white text-sm font-medium">Pace Calc</div>
+              </button>
+              <button
+                onClick={() => setPage("gear")}
+                className="flex items-center gap-2 bg-gray-900/60 rounded-xl p-3 border border-gray-700/30 hover:border-gray-600 transition-colors text-left"
+              >
+                <Footprints size={18} className="text-orange-400" />
+                <div className="text-white text-sm font-medium">Gear</div>
+              </button>
+              <button
+                onClick={() => setPage("routes")}
+                className="flex items-center gap-2 bg-gray-900/60 rounded-xl p-3 border border-gray-700/30 hover:border-gray-600 transition-colors text-left"
+              >
+                <Map size={18} className="text-sky-400" />
+                <div className="text-white text-sm font-medium">Routes</div>
+              </button>
+              <button
+                onClick={() => setShowProfileEditor(true)}
+                className="flex items-center gap-2 bg-gray-900/60 rounded-xl p-3 border border-gray-700/30 hover:border-gray-600 transition-colors text-left col-span-2"
+              >
+                <User size={18} className="text-violet-400" />
+                <div className="text-white text-sm font-medium">Edit Profile</div>
               </button>
             </div>
 
@@ -668,6 +743,28 @@ export default function HomePage({ setPage }) {
               </button>
 
               <ProfileExportButton />
+
+              <button
+                onClick={() => exportToCSV(state.events)}
+                className="w-full flex items-center gap-3 bg-gray-900/60 rounded-xl p-3 border border-gray-700/30 hover:border-gray-600 transition-colors text-left"
+              >
+                <FileSpreadsheet size={18} className="text-teal-400" />
+                <div>
+                  <div className="text-white text-sm font-medium">Export CSV</div>
+                  <div className="text-gray-500 text-xs">Spreadsheet / Strava format</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => setShowIGCard(true)}
+                className="w-full flex items-center gap-3 bg-gray-900/60 rounded-xl p-3 border border-gray-700/30 hover:border-gray-600 transition-colors text-left"
+              >
+                <Instagram size={18} className="text-pink-400" />
+                <div>
+                  <div className="text-white text-sm font-medium">Instagram Story</div>
+                  <div className="text-gray-500 text-xs">Download a 1080×1920 story card</div>
+                </div>
+              </button>
 
               <button
                 onClick={() => setShowResetConfirm(true)}
@@ -729,6 +826,25 @@ export default function HomePage({ setPage }) {
           }}
           onClose={() => setShowShareCard(false)}
         />
+      )}
+
+      {/* Instagram Story overlay */}
+      {showIGCard && (
+        <InstagramStoryCard
+          stats={{
+            totalEvents,
+            totalDistance,
+            totalElevation,
+            topEvents: completed.slice().reverse().slice(0, 5),
+            badgesCount: unlocked.length,
+          }}
+          onClose={() => setShowIGCard(false)}
+        />
+      )}
+
+      {/* Profile editor overlay */}
+      {showProfileEditor && (
+        <ProfileEditor onClose={() => setShowProfileEditor(false)} />
       )}
     </div>
   );

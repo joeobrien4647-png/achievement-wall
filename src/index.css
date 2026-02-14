@@ -134,3 +134,97 @@ a:focus:not(:focus-visible) {
   .pb-24 { padding-bottom: 1rem !important; }
   * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+
+/* Accent Color System */
+:root {
+  --accent: #6366f1;
+  --accent-10: #6366f11a;
+  --accent-20: #6366f133;
+  --accent-30: #6366f14d;
+}
+
+/* Light Mode — clean white backgrounds with dark text */
+.light-mode,
+.light-mode body {
+  background-color: #f8fafc !important;
+  color: #1e293b !important;
+}
+.light-mode .bg-gray-950 {
+  background-color: #f8fafc !important;
+}
+.light-mode .bg-gray-900 {
+  background-color: #ffffff !important;
+}
+.light-mode .bg-gray-800\/60,
+.light-mode .bg-gray-800\/50,
+.light-mode .bg-gray-800\/40,
+.light-mode .bg-gray-800\/30 {
+  background-color: rgba(241, 245, 249, 0.8) !important;
+}
+.light-mode .bg-gray-800 {
+  background-color: #f1f5f9 !important;
+}
+.light-mode .bg-gray-900\/60 {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+}
+.light-mode .text-white {
+  color: #1e293b !important;
+}
+.light-mode .text-gray-400 {
+  color: #64748b !important;
+}
+.light-mode .text-gray-500 {
+  color: #94a3b8 !important;
+}
+.light-mode .text-gray-300 {
+  color: #475569 !important;
+}
+.light-mode .text-gray-600 {
+  color: #94a3b8 !important;
+}
+.light-mode .border-gray-800,
+.light-mode .border-gray-700\/50,
+.light-mode .border-gray-700,
+.light-mode .border-gray-700\/30 {
+  border-color: #e2e8f0 !important;
+}
+.light-mode .border-white\/10 {
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+.light-mode .bg-white\/5 {
+  background-color: rgba(0, 0, 0, 0.03) !important;
+}
+.light-mode .bg-white\/10 {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+.light-mode .bg-black\/40,
+.light-mode .bg-black\/60 {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+}
+.light-mode .bg-gray-950\/90,
+.light-mode .bg-gray-950\/95 {
+  background-color: rgba(248, 250, 252, 0.95) !important;
+}
+.light-mode .placeholder\:text-gray-500::placeholder {
+  color: #94a3b8 !important;
+}
+/* Light mode charts tooltip */
+.light-mode .recharts-default-tooltip {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #1e293b !important;
+}
+/* Light mode scrollbar */
+.light-mode ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+.light-mode ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+
+/* Accent color utilities — use var(--accent) */
+.accent-bg { background-color: var(--accent) !important; }
+.accent-text { color: var(--accent) !important; }
+.accent-border { border-color: var(--accent) !important; }
+.accent-bg-10 { background-color: var(--accent-10) !important; }
+.accent-bg-20 { background-color: var(--accent-20) !important; }

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronLeft, X, Plus, Star, Camera, ChevronDown, Package, PoundSterling } from "lucide-react";
+import { ChevronLeft, X, Plus, Star, Camera, ChevronDown, Package, PoundSterling, Cloud, MessageSquare, Apple } from "lucide-react";
 import { useEvents } from "../hooks/useEvents";
 import { EVENT_TYPES, TYPE_COLORS, GRADIENT_PRESETS, createEvent } from "../data/schema";
 import { compressImage } from "../lib/photos";
@@ -491,6 +491,84 @@ export default function EventFormPage({ eventId, onBack }) {
                 ) : null;
               })()}
             </CollapsibleSection>
+
+            {/* Weather */}
+            {form.status === "completed" && (
+              <CollapsibleSection icon={Cloud} title="Race Day Weather">
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <Field label="Temperature (°C)">
+                      <input type="number" value={form.weather?.temp ?? ""} onChange={(e) => set("weather", { ...form.weather, temp: e.target.value === "" ? null : Number(e.target.value) })} placeholder="12" className={inputClass} />
+                    </Field>
+                    <Field label="Wind">
+                      <input type="text" value={form.weather?.wind ?? ""} onChange={(e) => set("weather", { ...form.weather, wind: e.target.value })} placeholder="Light breeze" className={inputClass} />
+                    </Field>
+                  </div>
+                  <Field label="Conditions">
+                    <div className="flex gap-2 flex-wrap">
+                      {["☀️ Sunny", "⛅ Cloudy", "🌧️ Rain", "🌨️ Snow", "💨 Windy", "🌫️ Fog", "🥵 Hot", "🥶 Cold"].map((c) => {
+                        const label = c.split(" ")[1];
+                        const isSelected = (form.weather?.conditions ?? "") === label;
+                        return (
+                          <button key={c} type="button" onClick={() => set("weather", { ...form.weather, conditions: isSelected ? "" : label })}
+                            className={`px-3 py-1.5 rounded-lg text-sm transition-all ${isSelected ? "bg-indigo-500/20 border-indigo-500 text-white border" : "bg-gray-800 border border-gray-700 text-gray-400 hover:border-gray-500"}`}>
+                            {c}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </Field>
+                </div>
+              </CollapsibleSection>
+            )}
+
+            {/* Race Review */}
+            {form.status === "completed" && (
+              <CollapsibleSection icon={MessageSquare} title="Race Review">
+                <div className="space-y-3">
+                  <Field label="Overall Rating">
+                    <DifficultyInput value={form.review?.rating ?? 0} onChange={(v) => set("review", { ...form.review, rating: v })} />
+                  </Field>
+                  <Field label="Would you do it again?">
+                    <div className="flex gap-2">
+                      {[{ label: "Absolutely!", value: true }, { label: "Probably not", value: false }].map((opt) => (
+                        <button key={String(opt.value)} type="button" onClick={() => set("review", { ...form.review, wouldRepeat: opt.value })}
+                          className={`flex-1 py-2 rounded-xl text-sm font-medium transition-all border-2 ${form.review?.wouldRepeat === opt.value ? "bg-indigo-500/20 border-indigo-500 text-white" : "bg-gray-800 border-gray-700 text-gray-400 hover:border-gray-500"}`}>
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </Field>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Field label="Organization">
+                      <DifficultyInput value={form.review?.organization ?? 0} onChange={(v) => set("review", { ...form.review, organization: v })} />
+                    </Field>
+                    <Field label="Course Quality">
+                      <DifficultyInput value={form.review?.courseQuality ?? 0} onChange={(v) => set("review", { ...form.review, courseQuality: v })} />
+                    </Field>
+                  </div>
+                </div>
+              </CollapsibleSection>
+            )}
+
+            {/* Nutrition */}
+            {(form.status === "completed" || form.status === "upcoming") && (
+              <CollapsibleSection icon={Apple} title={`Nutrition Plan${(form.nutrition?.length || 0) > 0 ? ` (${form.nutrition.length})` : ""}`}>
+                <div className="space-y-2">
+                  {(form.nutrition || []).map((item, i) => (
+                    <div key={i} className="flex items-center gap-2 bg-gray-900/60 rounded-lg p-2">
+                      <input type="text" value={item.time} onChange={(e) => { const n = [...form.nutrition]; n[i] = { ...n[i], time: e.target.value }; set("nutrition", n); }} placeholder="Hour 2" className="w-20 bg-transparent text-white text-sm border-none focus:outline-none placeholder:text-gray-600" />
+                      <input type="text" value={item.item} onChange={(e) => { const n = [...form.nutrition]; n[i] = { ...n[i], item: e.target.value }; set("nutrition", n); }} placeholder="Gel + 200ml water" className="flex-1 bg-transparent text-white text-sm border-none focus:outline-none placeholder:text-gray-600" />
+                      <button type="button" onClick={() => set("nutrition", form.nutrition.filter((_, j) => j !== i))} className="text-gray-600 hover:text-red-400"><X size={14} /></button>
+                    </div>
+                  ))}
+                  <button type="button" onClick={() => set("nutrition", [...(form.nutrition || []), { time: "", item: "" }])}
+                    className="w-full py-2 rounded-xl border-2 border-dashed border-gray-700 text-gray-500 text-sm hover:border-gray-500 hover:text-gray-300 transition-colors flex items-center justify-center gap-2">
+                    <Plus size={14} /> Add fuel point
+                  </button>
+                </div>
+              </CollapsibleSection>
+            )}
 
             {/* Upcoming-specific fields */}
             {form.status === "upcoming" && (

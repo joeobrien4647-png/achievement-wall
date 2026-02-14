@@ -69,6 +69,12 @@ export function createEvent(overrides = {}) {
     nutritionPlan: "",
     // Costs
     costs: { entry: 0, travel: 0, accommodation: 0, gear: 0, food: 0, other: 0 },
+    // Weather conditions
+    weather: { temp: null, conditions: "", wind: "" },
+    // Race review
+    review: { rating: 0, wouldRepeat: null, organization: 0, courseQuality: 0 },
+    // Nutrition/fueling log
+    nutrition: [],
     ...overrides,
   };
 }

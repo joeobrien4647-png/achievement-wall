@@ -4,6 +4,7 @@ import Nav from "./components/Nav";
 import Onboarding from "./components/Onboarding";
 import SkeletonLoader from "./components/SkeletonLoader";
 import { hapticLight } from "./lib/haptics";
+import { applyAccentColor, applyLightMode } from "./lib/themes";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const EventsPage = lazy(() => import("./pages/EventsPage"));
@@ -15,6 +16,8 @@ const EventFormPage = lazy(() => import("./pages/EventFormPage"));
 const WrappedPage = lazy(() => import("./pages/WrappedPage"));
 const CalendarPage = lazy(() => import("./pages/CalendarPage"));
 const PaceCalculatorPage = lazy(() => import("./pages/PaceCalculatorPage"));
+const GearPage = lazy(() => import("./pages/GearPage"));
+const RoutesPage = lazy(() => import("./pages/RoutesPage"));
 
 function AppShell() {
   const { state, dispatch } = useData();
@@ -34,6 +37,18 @@ function AppShell() {
   useEffect(() => {
     document.documentElement.classList.toggle("reduce-motion", reducedMotion);
   }, [reducedMotion]);
+
+  // Apply accent color
+  const accentColor = state.preferences?.accentColor ?? "#6366f1";
+  useEffect(() => {
+    applyAccentColor(accentColor);
+  }, [accentColor]);
+
+  // Apply light mode (OLED takes priority — never both)
+  const lightMode = state.preferences?.lightMode ?? false;
+  useEffect(() => {
+    applyLightMode(lightMode && !oledMode);
+  }, [lightMode, oledMode]);
 
   const navigate = useCallback((newPage) => {
     hapticLight();
@@ -123,6 +138,8 @@ function AppShell() {
           {page === "wrapped" && <WrappedPage />}
           {page === "calendar" && <CalendarPage />}
           {page === "pace" && <PaceCalculatorPage />}
+          {page === "gear" && <GearPage />}
+          {page === "routes" && <RoutesPage />}
           {page === "form" && <EventFormPage eventId={editEventId} onBack={closeForm} />}
         </div>
       </Suspense>
